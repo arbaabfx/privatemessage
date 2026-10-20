@@ -35,7 +35,7 @@ html,body{height:100%;margin:0;background:#f8fafc;color:#0f172a;font-family:Inte
    <div class="bub in text-xs" style="width:fit-content">Hey! 👋 Secure &amp; fast messaging</div>
    <div class="bub out text-xs" style="width:fit-content;margin-left:auto">Clean design &amp; custom themes! ✨</div>
   </div>
-  <label class="flex items-start gap-2 text-xs text-left text-slate-600 mb-4 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-600 rounded"><span>I agree to the <button type="button" id="tlink" class="text-blue-600 font-medium underline">Terms &amp; Conditions</button></span></label>
+  <label class="flex items-start gap-2 text-xs text-left text-slate-600 mb-4 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-600 rounded" onclick="document.getElementById('gbtn').disabled = !this.checked"><span>I agree to the <button type="button" id="tlink" class="text-blue-600 font-medium underline">Terms &amp; Conditions</button></span></label>
   <button id="gbtn" class="g w-full" disabled>Continue with Google</button>
   <p id="lerr" class="text-rose-500 text-xs mt-3"></p>
  </div></div>
