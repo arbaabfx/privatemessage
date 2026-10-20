@@ -1,88 +1,86 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>abchat</title>
+<title>abchat - Secure Messenger</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-html,body{height:100%;margin:0;background:#f8fafc;color:#0f172a;font-family:Inter,system-ui,sans-serif}
+html,body{height:100%;margin:0;background:#090d16;color:#f8fafc;font-family:Inter,system-ui,sans-serif}
 .hidden{display:none!important}
-.g{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;border-radius:12px;padding:.75rem 1.2rem;font-weight:600;transition:.2s;box-shadow:0 4px 12px rgba(37,99,235,.2)}.g:hover{opacity:.9;transform:translateY(-1px)}.g:disabled{opacity:.5;transform:none;box-shadow:none}
-.ic{width:40px;height:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;transition:.15s;font-size:18px;background:#f1f5f9;color:#334155}.ic:hover{background:#e2e8f0}
-.inp{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:.7rem 1rem;width:100%;outline:none;transition:.2s;color:#0f172a}.inp:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.1)}
-.row{display:flex;align-items:center;gap:12px;padding:12px 16px;width:100%;text-align:left;cursor:pointer;transition:.15s;border-radius:12px;margin:2px 0}.row:hover{background:#f1f5f9}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
-@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.pop{animation:pop .18s ease-out}
-#msgs{background-color:#f1f5f9;background-size:cover;background-position:center}
-.out{background:#2563eb;color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 2px 4px rgba(37,99,235,.15)}
-.in{background:#fff;color:#0f172a;border-radius:4px 16px 16px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.bub{padding:8px 12px;max-width:78%;word-break:break-word;white-space:pre-wrap;font-size:14.5px}
-.av{border-radius:50%;object-fit:cover;background:#e2e8f0;flex-shrink:0}
+.g{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border-radius:14px;padding:.85rem 1.2rem;font-weight:600;transition:.2s;box-shadow:0 8px 20px rgba(37,99,235,.3);cursor:pointer;width:100%;border:none;font-size:15px}.g:hover{opacity:.95;transform:translateY(-1px)}.g:disabled{opacity:.4;transform:none;box-shadow:none;cursor:not-allowed}
+.ic{width:42px;height:42px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;transition:.15s;font-size:18px;background:#1e293b;color:#cbd5e1;border:none;cursor:pointer}.ic:hover{background:#334155;color:#fff}
+.inp{background:#111827;border:1px solid #374151;border-radius:14px;padding:.75rem 1rem;width:100%;outline:none;transition:.2s;color:#fff}.inp:focus{border-color:#3b82f6;background:#0f172a;box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;width:100%;text-align:left;cursor:pointer;transition:.15s;border-radius:14px;margin:2px 0;background:transparent;border:none;color:#f8fafc}.row:hover{background:#1e293b}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#334155;border-radius:6px}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.pop{animation:pop .2s ease-out}
+#msgs{background-color:#0b0f19;background-size:cover;background-position:center}
+.out{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-radius:18px 4px 18px 18px;box-shadow:0 4px 12px rgba(37,99,235,.2)}
+.in{background:#1e293b;color:#f8fafc;border-radius:4px 18px 18px 18px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.bub{padding:9px 14px;max-width:78%;word-break:break-word;white-space:pre-wrap;font-size:14.5px}
+.av{border-radius:50%;object-fit:cover;background:#334155;flex-shrink:0}
 @media(max-width:767px){#main{display:none}#app.open #main{display:flex}#app.open #side{display:none}}
-.grad{background:linear-gradient(135deg,#f0f9ff,#e0f2fe,#bae6fd);background-size:300% 300%;animation:gs 12s ease infinite}
+.grad{background:radial-gradient(circle at top right,#1e1b4b,#0f172a,#020617);background-size:200% 200%;animation:gs 12s ease infinite}
 @keyframes gs{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
-.fl{position:absolute;bottom:-50px;font-size:26px;opacity:.4;animation:rise 14s linear infinite;pointer-events:none}
+.fl{position:absolute;bottom:-50px;font-size:24px;opacity:.25;animation:rise 15s linear infinite;pointer-events:none}
 @keyframes rise{to{transform:translateY(-115vh) rotate(360deg)}}
-.dot{width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;animation:bn 1s infinite}.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
-@keyframes bn{0%,60%,100%{transform:none}30%{transform:translateY(-4px)}}
 </style></head>
 <body>
 <div id="login" class="h-full relative overflow-hidden flex items-center justify-center p-4 grad">
- <span class="fl" style="left:8%;animation-delay:0s">💬</span><span class="fl" style="left:22%;animation-delay:-3s">✨</span><span class="fl" style="left:40%;animation-delay:-6s">🔒</span><span class="fl" style="left:60%;animation-delay:-2s">⚡</span><span class="fl" style="left:80%;animation-delay:-5s">🚀</span>
- <div class="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 text-center max-w-sm w-full pop border border-white/50">
-  <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white text-3xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">💬</div>
-  <h1 class="text-2xl font-bold tracking-tight text-slate-900">abchat</h1><p class="text-slate-500 text-sm mt-1">High-performance private messenger</p>
-  <div class="text-left space-y-2 my-5 bg-slate-50 rounded-2xl p-3 border border-slate-100">
-   <div class="bub in text-xs" style="width:fit-content">Hey! 👋 Secure &amp; fast messaging</div>
-   <div class="bub out text-xs" style="width:fit-content;margin-left:auto">Clean design &amp; custom themes! ✨</div>
+ <span class="fl" style="left:10%;animation-delay:0s">💬</span><span class="fl" style="left:25%;animation-delay:-4s">⚡</span><span class="fl" style="left:45%;animation-delay:-2s">🔒</span><span class="fl" style="left:70%;animation-delay:-6s">🚀</span><span class="fl" style="left:88%;animation-delay:-3s">✨</span>
+ <div class="relative bg-slate-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 text-center max-w-sm w-full pop border border-slate-800">
+  <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-400 text-white text-3xl flex items-center justify-center mb-4 shadow-xl shadow-blue-500/20">💬</div>
+  <h1 class="text-2xl font-bold tracking-tight text-white">abchat</h1><p class="text-slate-400 text-xs mt-1">Next-gen high-performance private messenger</p>
+  <div class="text-left space-y-2 my-5 bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80">
+   <div class="bub in text-xs" style="width:fit-content">Hey! 👋 Secure &amp; ultra fast</div>
+   <div class="bub out text-xs" style="width:fit-content;margin-left:auto">Custom themes &amp; admin controls ✨</div>
   </div>
-  <label class="flex items-start gap-2 text-xs text-left text-slate-600 mb-4 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-600 rounded" onclick="document.getElementById('gbtn').disabled = !this.checked"><span>I agree to the <button type="button" id="tlink" class="text-blue-600 font-medium underline">Terms &amp; Conditions</button></span></label>
-  <button id="gbtn" class="g w-full" disabled>Continue with Google</button>
-  <p id="lerr" class="text-rose-500 text-xs mt-3"></p>
+  <label class="flex items-start gap-2 text-xs text-left text-slate-400 mb-5 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-500 rounded bg-slate-900 border-slate-700" onchange="document.getElementById('gbtn').disabled = !this.checked"><span>I agree to the <button type="button" id="tlink" class="text-blue-400 font-medium underline">Terms &amp; Conditions</button></span></label>
+  <button id="gbtn" class="g" disabled>Continue with Google</button>
+  <p id="lerr" class="text-rose-400 text-xs mt-3"></p>
  </div></div>
 
-<div id="setup" class="hidden h-full flex items-center justify-center p-4 bg-slate-50">
- <div class="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full pop border border-slate-100">
-  <h2 class="text-xl font-bold text-slate-900 mb-1">Choose a username</h2><p class="text-slate-500 text-xs mb-4">3–20 letters, numbers or underscore (_)</p>
+<div id="setup" class="hidden h-full flex items-center justify-center p-4 bg-[#090d16]">
+ <div class="bg-slate-900 rounded-3xl shadow-2xl p-8 max-w-sm w-full pop border border-slate-800">
+  <h2 class="text-xl font-bold text-white mb-1">Choose a username</h2><p class="text-slate-400 text-xs mb-4">3–20 letters, numbers or underscore (_)</p>
   <input id="uname" class="inp mb-2" maxlength="20" placeholder="username" autocomplete="off">
-  <p id="uerr" class="text-rose-500 text-xs h-5 mb-2"></p><button id="ubtn" class="g w-full">Get Started</button>
+  <p id="uerr" class="text-rose-400 text-xs h-5 mb-2"></p><button id="ubtn" class="g">Get Started</button>
  </div></div>
 
 <div id="app" class="hidden h-full flex">
- <aside id="side" class="w-full md:w-[380px] bg-white border-r border-slate-200 flex flex-col shrink-0">
-  <div class="h-16 px-4 bg-slate-50/80 border-b border-slate-100 flex items-center gap-3">
-   <img id="myimg" class="av w-11 h-11 cursor-pointer ring-2 ring-blue-500/20" alt="">
-   <div class="min-w-0 flex-1"><div id="myname" class="font-semibold text-slate-900 truncate"></div><div class="text-xs text-emerald-600 font-medium">Online</div></div>
+ <aside id="side" class="w-full md:w-[380px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+  <div class="h-16 px-4 bg-slate-900/90 border-b border-slate-800 flex items-center gap-3">
+   <img id="myimg" class="av w-11 h-11 cursor-pointer ring-2 ring-blue-500/30" alt="">
+   <div class="min-w-0 flex-1"><div id="myname" class="font-semibold text-white truncate"></div><div class="text-xs text-emerald-400 font-medium">Online</div></div>
    <button id="grpbtn" class="ic" title="New Group">👥</button>
    <button id="setbtn" class="ic" title="Settings">⚙️</button>
   </div>
-  <div class="p-3"><input id="search" class="inp !rounded-full !bg-slate-100 !border-0" placeholder="🔍 Search username..." autocomplete="off"><div id="results" class="mt-1"></div></div>
-  <div class="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Chats &amp; Groups</div>
+  <div class="p-3"><input id="search" class="inp !rounded-full !bg-slate-950 !border-slate-800" placeholder="🔍 Search username..." autocomplete="off"><div id="results" class="mt-1"></div></div>
+  <div class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Chats &amp; Groups</div>
   <div id="chats" class="flex-1 overflow-y-auto px-2 space-y-1"></div>
  </aside>
- <main id="main" class="flex-1 flex-col min-w-0 flex bg-slate-50">
-  <div id="empty" class="m-auto text-center text-slate-400 p-6"><div class="text-6xl mb-3">💬</div><div class="text-lg font-semibold text-slate-700">abchat Messenger</div><p class="text-sm text-slate-400 mt-1">Select a chat or search a username to start messaging.</p></div>
+ <main id="main" class="flex-1 flex-col min-w-0 flex bg-[#0b0f19]">
+  <div id="empty" class="m-auto text-center text-slate-500 p-6"><div class="text-6xl mb-3">💬</div><div class="text-lg font-semibold text-slate-300">abchat Messenger</div><p class="text-sm text-slate-500 mt-1">Select a chat or search a username to start messaging.</p></div>
   <div id="chat" class="hidden flex-1 flex-col min-h-0 flex">
-   <div id="hdr" class="h-16 px-3 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center gap-3 cursor-pointer">
+   <div id="hdr" class="h-16 px-3 bg-slate-900/90 backdrop-blur border-b border-slate-800 flex items-center gap-3 cursor-pointer">
     <button id="back" class="ic md:hidden !w-9 !h-9">←</button><img id="pimg" class="av w-10 h-10" alt="">
-    <div class="min-w-0 flex-1"><div id="pname" class="font-semibold text-slate-900 truncate"></div><div id="pseen" class="text-xs text-slate-400"></div></div>
+    <div class="min-w-0 flex-1"><div id="pname" class="font-semibold text-white truncate"></div><div id="pseen" class="text-xs text-slate-400"></div></div>
     <button id="arcbtn" class="ic !w-9 !h-9 text-xs" title="Archive Chat">📦</button>
    </div>
    <div id="msgs" class="flex-1 overflow-y-auto px-4 md:px-12 py-4 space-y-2"></div>
-   <div id="prog" class="hidden h-1 bg-slate-200"><div id="bar" class="h-1 bg-blue-600 transition-all" style="width:0"></div></div>
-   <div id="blockedmsg" class="hidden text-center text-xs text-rose-600 bg-rose-50 py-2 border-t border-rose-100"></div>
-   <div class="relative px-3 py-3 bg-white border-t border-slate-200 flex items-center gap-2">
-    <div id="emenu" class="hidden absolute bottom-16 left-3 bg-white rounded-2xl shadow-2xl p-3 w-72 flex flex-wrap gap-1 pop border border-slate-100"></div>
-    <div id="amenu" class="hidden absolute bottom-16 left-12 bg-white rounded-2xl shadow-xl py-2 pop border border-slate-100 w-48"><button id="apic" class="row text-xs">🖼️ Photo / Video</button><button id="adoc" class="row text-xs">📄 Document</button></div>
+   <div id="prog" class="hidden h-1 bg-slate-800"><div id="bar" class="h-1 bg-blue-500 transition-all" style="width:0"></div></div>
+   <div id="blockedmsg" class="hidden text-center text-xs text-rose-400 bg-rose-950/40 py-2 border-t border-rose-900/50"></div>
+   <div class="relative px-3 py-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+    <div id="emenu" class="hidden absolute bottom-16 left-3 bg-slate-900 rounded-2xl shadow-2xl p-3 w-72 flex flex-wrap gap-1 pop border border-slate-800"></div>
+    <div id="amenu" class="hidden absolute bottom-16 left-12 bg-slate-900 rounded-2xl shadow-xl py-2 pop border border-slate-800 w-48"><button id="apic" class="row text-xs">🖼️ Photo / Video</button><button id="adoc" class="row text-xs">📄 Document</button></div>
     <button id="ebtn" class="ic !w-10 !h-10">😊</button><button id="abtn" class="ic !w-10 !h-10">📎</button>
-    <input id="msg" class="inp !rounded-full !bg-slate-100 !border-0" placeholder="Type a message..." autocomplete="off" maxlength="2000">
-    <button id="send" class="ic !bg-blue-600 !text-white !w-10 !h-10 shadow-md shadow-blue-500/20">➤</button>
+    <input id="msg" class="inp !rounded-full !bg-slate-950 !border-slate-800" placeholder="Type a message..." autocomplete="off" maxlength="2000">
+    <button id="send" class="ic !bg-blue-600 !text-white !w-10 !h-10 shadow-lg shadow-blue-500/20">➤</button>
    </div>
   </div>
  </main>
 </div>
 <input id="fmedia" type="file" accept="image/*,video/*" class="hidden"><input id="fdoc" type="file" class="hidden"><input id="favatar" type="file" accept="image/*" class="hidden"><input id="fbg" type="file" accept="image/*" class="hidden">
-<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3"></div>
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white rounded-full px-5 py-2.5 text-xs shadow-xl hidden"></div>
+<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3"></div>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 text-white rounded-full px-5 py-2.5 text-xs shadow-2xl border border-slate-700 hidden"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -97,20 +95,19 @@ const $=i=>document.getElementById(i);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(t.h);t.h=setTimeout(()=>t.classList.add('hidden'),3200)};
 const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
-const modal=h=>{$('modal').innerHTML=`<div class="bg-white rounded-3xl shadow-2xl max-h-[92vh] overflow-auto pop border border-slate-100">${h}</div>`;$('modal').classList.remove('hidden')};
+const modal=h=>{$('modal').innerHTML=`<div class="bg-slate-900 text-white rounded-3xl shadow-2xl max-h-[92vh] overflow-auto pop border border-slate-800">${h}</div>`;$('modal').classList.remove('hidden')};
 const closeModal=()=>$('modal').classList.add('hidden');$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 
-const S=Object.assign({sound:true,enter:true,theme:'default',customBg:''},JSON.parse(localStorage.getItem('abchat_s')||'{}'));
+const S=Object.assign({sound:true,enter:true,theme:'dark',customBg:''},JSON.parse(localStorage.getItem('abchat_s')||'{}'));
 const applyTheme=()=>{const m=$('msgs');if(!m)return;if(S.customBg){m.style.backgroundImage=`url(${S.customBg})`;return}
- if(S.theme==='dark')m.style.backgroundImage='radial-gradient(#334155 1px,transparent 1px)';
- else if(S.theme==='blue')m.style.backgroundImage='radial-gradient(#93c5fd 1px,transparent 1px)';
- else if(S.theme==='minimal')m.style.backgroundImage='none';
- else m.style.backgroundImage='radial-gradient(#cbd5e1 1px,transparent 1px)';
+ if(S.theme==='light')m.style.backgroundImage='radial-gradient(#cbd5e1 1px,transparent 1px)';
+ else if(S.theme==='blue')m.style.backgroundImage='radial-gradient(#38bdf8 1px,transparent 1px)';
+ else m.style.backgroundImage='radial-gradient(#1e293b 1px,transparent 1px)';
 };
 
 const beep=()=>{try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.05;o.start();o.stop(a.currentTime+.12)}catch{}};
 const ago=ts=>{if(!ts)return'';const s=(Date.now()-ts.toDate())/1e3;return s<90?'online':s<3600?'last seen '+Math.floor(s/60)+'m ago':s<86400?'last seen '+Math.floor(s/3600)+'h ago':'last seen '+ts.toDate().toLocaleDateString()};
-const avatar=u=>u?.photoURL||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#e2e8f0"/><text x="20" y="27" font-size="18" text-anchor="middle" fill="#64748b" font-family="Arial">'+esc((u?.name||u?.username||'?')[0]?.toUpperCase())+'</text></svg>');
+const avatar=u=>u?.photoURL||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#334155"/><text x="20" y="27" font-size="18" text-anchor="middle" fill="#fff" font-family="Arial">'+esc((u?.name||u?.username||'?')[0]?.toUpperCase())+'</text></svg>');
 const nm=u=>u?.name||u?.username||'User';
 const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDateString()===t.toDateString()?'Today':d.toDateString()===y.toDateString()?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
 const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
@@ -134,16 +131,33 @@ async function encrypt(key,t){const iv=crypto.getRandomValues(new Uint8Array(12)
 async function decrypt(key,m){try{return td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(m.iv)},key,unb64(m.ct)))}catch{return'🔒 Unable to decrypt'}}
 
 let me,profile,cur,unsubs=[],chatsUnsub,presence,userCache=new Map(),tokR=0;
-const TERMS=`<div class="p-6 w-[92vw] max-w-md text-sm text-slate-700 space-y-3"><h3 class="text-lg font-bold text-slate-900">Terms &amp; Conditions</h3>
-<p><b>1. Usage:</b> Use abchat responsibly. Do not send prohibited, spam, or malicious content.</p>
-<p><b>2. Privacy:</b> Messages are end-to-end encrypted. Media is stored securely.</p>
-<button class="g w-full mt-2" onclick="document.getElementById('terms').checked=true;document.getElementById('terms').dispatchEvent(new Event('change'));closeModal()">I Agree</button></div>`;
-$('tlink').onclick=()=>modal(TERMS);$('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};$('terms').onchange();$('gbtn').onclick=()=>{if(!$('terms').checked)return toast('Please accept Terms & Conditions');signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$('lerr').textContent=e.message)};
+const TERMS=`<div class="p-6 w-[92vw] max-w-md text-sm text-slate-300 space-y-3"><h3 class="text-lg font-bold text-white">Terms &amp; Conditions</h3>
+<p><b>1. Usage:</b> Use abchat responsibly. Do not send spam or malicious content.</p>
+<p><b>2. Privacy:</b> Messages are securely encrypted.</p>
+<button class="g mt-2" onclick="document.getElementById('terms').checked=true;document.getElementById('gbtn').disabled=false;closeModal()">I Agree</button></div>`;
+$('tlink').onclick=()=>modal(TERMS);
+
+// Google Sign-In Robust Button Handler
+$('gbtn').onclick = async () => {
+  if (!$('terms').checked) return toast('Please accept Terms & Conditions');
+  try {
+    $('gbtn').disabled = true;
+    $('gbtn').textContent = 'Signing in...';
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch (e) {
+    $('lerr').textContent = e.message;
+    $('gbtn').disabled = false;
+    $('gbtn').textContent = 'Continue with Google';
+  }
+};
+
 onAuthStateChanged(auth,async u=>{clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();
- if(!u){me=null;show('login');return}
+ if(!u){me=null;show('login');$('gbtn').disabled=!$('terms').checked;$('gbtn').textContent='Continue with Google';return}
  me=u;try{const s=await getDoc(doc(db,'users',u.uid));if(!s.exists()){show('setup');return}
   profile=s.data();if(profile.disabled){alert('Your account is disabled.');signOut(auth);return}await boot()}
- catch(e){show('login');$('lerr').textContent='Database error: '+e.message}});$('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');err.textContent='';
+ catch(e){show('login');$('lerr').textContent='Database error: '+e.message}});
+
+$('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');err.textContent='';
  if(!/^[a-z0-9_]{3,20}$/.test(n)){err.textContent='Use 3–20 letters, numbers or _';return}
  try{await initKeys(me.uid);
   await runTransaction(db,async tx=>{const ur=doc(db,'usernames',n);if((await tx.get(ur)).exists())throw new Error('taken');
@@ -167,26 +181,26 @@ let st;$('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().to
  st=setTimeout(async()=>{
   const s=await getDocs(query(collection(db,'users'),where('usernameLower','>=',q),where('usernameLower','<=',q+'\uf8ff'),limit(8)));
   r.innerHTML='';let n=0;s.forEach(d=>{if(d.id===me.uid)return;n++;const u={uid:d.id,...d.data()};userCache.set(d.id,u);
-   const b=document.createElement('button');b.className='row pop';b.innerHTML=`<img src="${esc(avatar(u))}" class="av w-10 h-10"><div><div class="font-medium text-sm text-slate-900">${esc(nm(u))}</div><div class="text-xs text-slate-400">@${esc(u.username)}</div></div>`;
+   const b=document.createElement('button');b.className='row pop';b.innerHTML=`<img src="${esc(avatar(u))}" class="av w-10 h-10"><div><div class="font-medium text-sm text-white">${esc(nm(u))}</div><div class="text-xs text-slate-400">@${esc(u.username)}</div></div>`;
    b.onclick=()=>{$('search').value='';r.innerHTML='';openChat(u)};r.appendChild(b)});
-  if(!n)r.innerHTML='<div class="text-xs text-slate-400 p-3">No user found.</div>'},250)};
+  if(!n)r.innerHTML='<div class="text-xs text-slate-500 p-3">No user found.</div>'},250)};
 
 function listenChats(){chatsUnsub=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),async snap=>{
  const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data(),isG=c.isGroup;let name=c.groupName||'',pic='',pv='Say hi 👋';
   if(isG){pic=c.groupPhoto||'';}else{const p=await getUser(c.members.find(x=>x!==me.uid));name=nm(p);pic=avatar(p);if(c.pv&&p?.pubKey){pv=await decrypt(await keyFor(p),c.pv);if(pv.startsWith('🔒'))pv='🔒 Encrypted'}}
   return{id:d.id,c,name,pic,pv,t:c.updatedAt?.toMillis?.()||0,isArchived:c.archivedBy?.[me.uid]||false}}));
  rows.sort((a,b)=>b.t-a.t);const box=$('chats');box.innerHTML='';
- if(!rows.length){box.innerHTML='<div class="text-center text-slate-400 text-xs p-8">No chats yet. Search above.</div>';return}
+ if(!rows.length){box.innerHTML='<div class="text-center text-slate-500 text-xs p-8">No chats yet. Search above.</div>';return}
  rows.forEach(({id,c,name,pic,pv,isArchived})=>{
-  const b=document.createElement('button');b.className='row';if(isArchived)b.style.opacity='0.6';
-  b.innerHTML=`<img src="${esc(pic)}" class="av w-11 h-11"><div class="min-w-0 flex-1 border-b border-slate-100 pb-2"><div class="font-medium text-sm text-slate-900 truncate flex justify-between"><span>${esc(name)}</span>${isArchived?'<span class="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">Archived</span>':''}</div><div class="text-xs text-slate-500 truncate">${esc(pv)}</div></div>`;
+  const b=document.createElement('button');b.className='row';if(isArchived)b.style.opacity='0.5';
+  b.innerHTML=`<img src="${esc(pic)}" class="av w-11 h-11"><div class="min-w-0 flex-1 border-b border-slate-800 pb-2"><div class="font-medium text-sm text-white truncate flex justify-between"><span>${esc(name)}</span>${isArchived?'<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">Archived</span>':''}</div><div class="text-xs text-slate-400 truncate">${esc(pv)}</div></div>`;
   b.onclick=()=>openChat({uid:id,isGroup:c.isGroup,groupName:c.groupName,groupPhoto:c.groupPhoto,members:c.members});box.appendChild(b)})})}
 
 async function openChat(peer){closeChat();
  const isG=peer.isGroup;const id=isG?peer.uid:chatId(me.uid,peer.uid);
- if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.pubKey){toast('User not ready');return}}
+ if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.peer.pubKey){toast('User not ready');return}}
  const c=cur={id,peer,isGroup:isG,key:isG?null:await keyFor(peer),iBlocked:false,blockedMe:false,cache:new Map(),meta:new Map()};
- $('empty').classList.add('hidden');$('chat').classList.remove('hidden');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||'data:image/svg+xml,...'):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';applyTheme();
+ $('empty').classList.add('hidden');$('chat').classList.remove('hidden');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||''):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';applyTheme();
  if(!isG){unsubs.push(onSnapshot(doc(db,'users',peer.uid),s=>{if(cur!==c)return;c.peer={uid:peer.uid,...s.data()};userCache.set(peer.uid,c.peer);$('pseen').textContent=ago(s.data()?.lastActive);$('pname').textContent=nm(c.peer);$('pimg').src=avatar(c.peer)}))}
  else{$('pseen').textContent=`${peer.members.length} members`;}
  unsubs.push(onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts','desc'),limit(150)),s=>{
@@ -199,13 +213,13 @@ async function render(c,docs){const tok=++tokR,items=[];
  if(tok!==tokR||cur!==c)return;
  const box=$('msgs'),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<150||!box.dataset.i;let day='',h='';
  for(const {id,m,x} of items){const d=m.ts?.toDate()||new Date(),dl=dlabel(d),mine=m.from===me.uid;
-  if(dl!==day){day=dl;h+=`<div class="text-center my-2"><span class="bg-white/80 backdrop-blur text-[10px] font-medium text-slate-500 rounded-lg px-3 py-1 shadow-sm border border-slate-200/50">${dl}</span></div>`}
+  if(dl!==day){day=dl;h+=`<div class="text-center my-2"><span class="bg-slate-900/90 text-[10px] font-medium text-slate-400 rounded-lg px-3 py-1 shadow border border-slate-800">${dl}</span></div>`}
   let body;
   if(m.type==='image')body=`<img src="${esc(m.url)}" data-img="${esc(m.url)}" class="rounded-xl max-h-72 max-w-full cursor-pointer" loading="lazy">`;
   else if(m.type==='video')body=`<video controls preload="metadata" src="${esc(m.url)}" class="rounded-xl max-h-72 max-w-full"></video>`;
-  else if(m.type==='file')body=`<a href="${esc(m.url)}" target="_blank" rel="noopener" class="flex items-center gap-2 bg-black/5 rounded-xl p-2.5 min-w-[200px]"><span class="text-2xl">📄</span><span class="min-w-0"><span class="block truncate text-xs font-semibold">${esc(x.n||'Document')}</span><span class="block text-[10px] opacity-75">${fsize(x.s||0)}</span></span></a>`;
+  else if(m.type==='file')body=`<a href="${esc(m.url)}" target="_blank" rel="noopener" class="flex items-center gap-2 bg-black/20 rounded-xl p-2.5 min-w-[200px]"><span class="text-2xl">📄</span><span class="min-w-0"><span class="block truncate text-xs font-semibold">${esc(x.n||'Document')}</span><span class="block text-[10px] opacity-70">${fsize(x.s||0)}</span></span></a>`;
   else body=esc(c.isGroup?m.ct:x.t);
-  h+=`<div class="flex ${mine?'justify-end':'justify-start'} group pop"><div class="bub ${mine?'out':'in'}">${body}<div class="text-[9px] opacity-70 text-right mt-1">${m.ts?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'⏳'}${mine?`<button data-del="${id}" class="ml-2 opacity-0 group-hover:opacity-100 hover:text-rose-300">🗑</button>`:''}</div></div></div>`}
+  h+=`<div class="flex ${mine?'justify-end':'justify-start'} group pop"><div class="bub ${mine?'out':'in'}">${body}<div class="text-[9px] opacity-70 text-right mt-1">${m.ts?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'⏳'}${mine?`<button data-del="${id}" class="ml-2 opacity-0 group-hover:opacity-100 hover:text-rose-400">🗑</button>`:''}</div></div></div>`}
  box.innerHTML=h;if(bottom){box.scrollTop=box.scrollHeight;box.dataset.i=1}}
 
 $('msgs').onclick=e=>{const t=e.target.dataset||{};if(t.img)modal(`<img src="${esc(t.img)}" class="max-w-[94vw] max-h-[88vh] rounded-2xl">`);
@@ -233,29 +247,28 @@ $('grpbtn').onclick=()=>{
  modal(`<div class="p-6 w-[92vw] max-w-sm"><h3 class="text-lg font-bold mb-3">Create New Group</h3>
  <input id="gname" class="inp mb-3" placeholder="Group Name" maxlength="30">
  <input id="gmem" class="inp mb-4" placeholder="Member Usernames (comma separated)">
- <button id="gcreate" class="g w-full">Create Group</button></div>`);
+ <button id="gcreate" class="g">Create Group</button></div>`);
  $('gcreate').onclick=async()=>{const name=$('gname').value.trim();const mems=$('gmem').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
   if(!name||!mems.length)return toast('Enter group name & members');
-  try{const uids=[me.uid];for(const m of mems){const qy=await getDocs(query(collection(db,'usernames'),where('uid','>=',''))); // fetch check
-   const snap=await getDoc(doc(db,'usernames',m));if(snap.exists())uids.push(snap.data().uid)}
+  try{const uids=[me.uid];for(const m of mems){const snap=await getDoc(doc(db,'usernames',m));if(snap.exists())uids.push(snap.data().uid)}
    const gid='g_'+Date.now();await setDoc(doc(db,'chats',gid),{isGroup:true,groupName:name,members:uids,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
    closeModal();toast('Group created successfully!');}catch(e){toast('Failed to create group: '+e.message)}}
 };
 
 function settings(){
  modal(`<div class="p-6 w-[92vw] max-w-sm"><h3 class="text-lg font-bold mb-4">Settings</h3>
- <div class="text-center mb-4"><img id="sav" src="${esc(avatar(profile))}" class="av w-20 h-20 mx-auto cursor-pointer"><button id="schg" class="text-xs text-blue-600 font-semibold mt-1">Change Photo</button></div>
+ <div class="text-center mb-4"><img id="sav" src="${esc(avatar(profile))}" class="av w-20 h-20 mx-auto cursor-pointer"><button id="schg" class="text-xs text-blue-400 font-semibold mt-1">Change Photo</button></div>
  <label class="text-xs text-slate-400 font-medium">Name</label><input id="sname" class="inp mb-3" value="${esc(profile.name||'')}">
  <label class="text-xs text-slate-400 font-medium">About</label><input id="sabout" class="inp mb-3" value="${esc(profile.about||'')}">
  <label class="text-xs text-slate-400 font-medium">Chat Theme</label>
- <select id="sthem" class="inp mb-3"><option value="default">Default Light</option><option value="blue">Sky Blue</option><option value="dark">Dark Slate</option><option value="minimal">Minimal Clean</option></select>
+ <select id="sthem" class="inp mb-3"><option value="dark">Dark Slate</option><option value="light">Light Clean</option><option value="blue">Neon Blue</option></select>
  <button id="bgbtn" class="ic !w-full !rounded-xl text-xs mb-3">🖼️ Upload Custom Chat Background</button>
  <label class="flex items-center gap-2 mb-2 text-sm"><input type="checkbox" id="ssound" ${S.sound?'checked':''}> Message sound</label>
  <label class="flex items-center gap-2 mb-4 text-sm"><input type="checkbox" id="senter" ${S.enter?'checked':''}> Press Enter to send</label>
- <button id="ssave" class="g w-full mb-2">Save Changes</button>
+ <button id="ssave" class="g mb-2">Save Changes</button>
  <button id="sinv" class="ic !w-full !rounded-xl text-xs mb-1">🔗 Copy Invite Link</button>
  ${me.email===ADMIN_EMAIL?'<button id="sadm" class="ic !w-full !rounded-xl text-xs mb-1">🛡️ Admin Dashboard</button>':''}
- <button id="sout" class="ic !w-full !rounded-xl text-xs text-rose-600">Sign Out</button></div>`);
+ <button id="sout" class="ic !w-full !rounded-xl text-xs text-rose-400">Sign Out</button></div>`);
  $('sthem').value=S.theme;
  $('schg').onclick=$('sav').onclick=()=>$('favatar').click();$('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL=await avatarData(f);$('sav').src=profile.photoURL}};$('bgbtn').onclick=()=>$('fbg').click();$('fbg').onchange=async e=>{const f=e.target.files[0];if(f){S.customBg=await avatarData(f);toast('Custom background set!')}};
  $('ssave').onclick=async()=>{S.theme=$('sthem').value;S.sound=$('ssound').checked;S.enter=$('senter').checked;localStorage.setItem('abchat_s',JSON.stringify(S));
@@ -269,7 +282,7 @@ async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;
  const us=await getDocs(collection(db,'users'));
  modal(`<div class="p-5 w-[96vw] max-w-4xl"><div class="flex justify-between mb-3"><h3 class="text-lg font-bold">Admin Dashboard (${us.size} users)</h3><button class="ic" onclick="closeModal()">✕</button></div>
  <div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-left text-slate-400"><tr><th class="p-2">User</th><th>Username</th><th>Status</th><th></th></tr></thead><tbody>
- ${us.docs.map(d=>{const u=d.data();return`<tr class="border-t"><td class="p-2 flex items-center gap-2"><img src="${esc(avatar(u))}" class="av w-7 h-7">${esc(u.name)}</td><td>@${esc(u.username)}</td><td>${u.disabled?'<span class="text-rose-500">Disabled</span>':'<span class="text-emerald-500">Active</span>'}</td><td><button class="ic !w-auto !rounded-lg px-2 text-xs" onclick="window.toggleUser('${d.id}',${u.disabled?1:0})">${u.disabled?'Enable':'Disable'}</button></td></tr>`}).join('')}</tbody></table></div></div>`);
+ ${us.docs.map(d=>{const u=d.data();return`<tr class="border-t border-slate-800"><td class="p-2 flex items-center gap-2"><img src="${esc(avatar(u))}" class="av w-7 h-7">${esc(u.name)}</td><td>@${esc(u.username)}</td><td>${u.disabled?'<span class="text-rose-400">Disabled</span>':'<span class="text-emerald-400">Active</span>'}</td><td><button class="ic !w-auto !rounded-lg px-2 text-xs" onclick="window.toggleUser('${d.id}',${u.disabled?1:0})">${u.disabled?'Enable':'Disable'}</button></td></tr>`}).join('')}</tbody></table></div></div>`);
 }
 window.toggleUser=async(id,d)=>{await updateDoc(doc(db,'users',id),{disabled:d===1?false:true});toast('Updated');adminPanel()};
 </script></body></html>
