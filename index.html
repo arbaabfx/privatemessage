@@ -33,7 +33,10 @@ html,body{height:100%;margin:0;background:#090d16;color:#f8fafc;font-family:Inte
    <div class="bub in text-xs" style="width:fit-content">Hey! 👋 Secure &amp; ultra fast</div>
    <div class="bub out text-xs" style="width:fit-content;margin-left:auto">Custom themes &amp; admin controls ✨</div>
   </div>
-  <label class="flex items-start gap-2 text-xs text-left text-slate-400 mb-5 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-500 rounded bg-slate-900 border-slate-700"><span>I agree to the <button type="button" id="tlink" class="text-blue-400 font-medium underline">Terms &amp; Conditions</button></span></label>
+  <label class="flex items-start gap-2 text-xs text-left text-slate-400 mb-5 cursor-pointer">
+   <input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-500 rounded bg-slate-900 border-slate-700" onclick="document.getElementById('gbtn').disabled = !this.checked">
+   <span>I agree to the <button type="button" id="tlink" class="text-blue-400 font-medium underline">Terms &amp; Conditions</button></span>
+  </label>
   <button id="gbtn" class="g" disabled>Continue with Google</button>
   <p id="lerr" class="text-rose-400 text-xs mt-3"></p>
  </div></div>
@@ -84,7 +87,7 @@ html,body{height:100%;margin:0;background:#090d16;color:#f8fafc;font-family:Inte
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,getAuth} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {GoogleAuthProvider,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,getAuth} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getStorage,ref,uploadBytesResumable,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
@@ -137,23 +140,22 @@ const TERMS=`<div class="p-6 w-[92vw] max-w-md text-sm text-slate-300 space-y-3"
 <button class="g mt-2" onclick="document.getElementById('terms').checked=true;document.getElementById('gbtn').disabled=false;closeModal()">I Agree</button></div>`;
 $('tlink').onclick=()=>modal(TERMS);
 
-// Robust Checkbox & Button Event Listeners
-$('terms').onchange = () => {
-  $('gbtn').disabled = !$('terms').checked;
-};
-
+// Redirect login handler (bypass popup blockers completely)
 $('gbtn').onclick = async () => {
   if (!$('terms').checked) return toast('Please accept Terms & Conditions');
   try {
     $('gbtn').disabled = true;
-    $('gbtn').textContent = 'Signing in...';
-    await signInWithPopup(auth, new GoogleAuthProvider());
+    $('gbtn').textContent = 'Redirecting to Google...';
+    await signInWithRedirect(auth, new GoogleAuthProvider());
   } catch (e) {
     $('lerr').textContent = e.message;
     $('gbtn').disabled = false;
     $('gbtn').textContent = 'Continue with Google';
   }
 };
+
+// Handle redirect result back to the app
+getRedirectResult(auth).catch(e => { $('lerr').textContent = e.message; });
 
 onAuthStateChanged(auth,async u=>{clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();
  if(!u){me=null;show('login');$('gbtn').disabled=!$('terms').checked;$('gbtn').textContent='Continue with Google';return}
