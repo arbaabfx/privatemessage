@@ -33,7 +33,7 @@ html,body{height:100%;margin:0;background:#090d16;color:#f8fafc;font-family:Inte
    <div class="bub in text-xs" style="width:fit-content">Hey! 👋 Secure &amp; ultra fast</div>
    <div class="bub out text-xs" style="width:fit-content;margin-left:auto">Custom themes &amp; admin controls ✨</div>
   </div>
-  <label class="flex items-start gap-2 text-xs text-left text-slate-400 mb-5 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-500 rounded bg-slate-900 border-slate-700" onchange="document.getElementById('gbtn').disabled = !this.checked"><span>I agree to the <button type="button" id="tlink" class="text-blue-400 font-medium underline">Terms &amp; Conditions</button></span></label>
+  <label class="flex items-start gap-2 text-xs text-left text-slate-400 mb-5 cursor-pointer"><input type="checkbox" id="terms" class="mt-0.5 w-4 h-4 accent-blue-500 rounded bg-slate-900 border-slate-700"><span>I agree to the <button type="button" id="tlink" class="text-blue-400 font-medium underline">Terms &amp; Conditions</button></span></label>
   <button id="gbtn" class="g" disabled>Continue with Google</button>
   <p id="lerr" class="text-rose-400 text-xs mt-3"></p>
  </div></div>
@@ -137,6 +137,11 @@ const TERMS=`<div class="p-6 w-[92vw] max-w-md text-sm text-slate-300 space-y-3"
 <button class="g mt-2" onclick="document.getElementById('terms').checked=true;document.getElementById('gbtn').disabled=false;closeModal()">I Agree</button></div>`;
 $('tlink').onclick=()=>modal(TERMS);
 
+// Robust Checkbox & Button Event Listeners
+$('terms').onchange = () => {
+  $('gbtn').disabled = !$('terms').checked;
+};
+
 $('gbtn').onclick = async () => {
   if (!$('terms').checked) return toast('Please accept Terms & Conditions');
   try {
@@ -188,17 +193,6 @@ function listenChats(){chatsUnsub=onSnapshot(query(collection(db,'chats'),where(
  const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data(),isG=c.isGroup;let name=c.groupName||'',pic='',pv='Say hi 👋';
   if(isG){pic=c.groupPhoto||'';}else{const p=await getUser(c.members.find(x=>x!==me.uid));name=nm(p);pic=avatar(p);if(c.pv&&p?.pubKey){pv=await decrypt(await keyFor(p),c.pv);if(pv.startsWith('🔒'))pv='🔒 Encrypted'}}
   return{id:d.id,c,name,pic,pv,t:c.updatedAt?.toMillis?.()||0,isArchived:c.archivedBy?.[me.uid]||false}}));
- rows.sort((a,b)=>b.t-a.t);const box=$('chats');box.innerHTML='';
- if(!rows.length){box.innerHTML='<div class="text-center text-slate-500 text-xs p-8">No chats yet. Search above.</div>';return}
- rows.forEach(({id,c,name,pic,pv,isArchived})=>{
-  const b=document.createElement('button');b.className='row';if(isArchived)b.style.opacity='0.5';
-  b.innerHTML=`<img src="${esc(pic)}" class="av w-11 h-11"><div class="min-w-0 flex-1 border-b border-slate-800 pb-2"><div class="font-medium text-sm text-white truncate flex justify-between"><span>${esc(name)}</span>${isArchived?'<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">Archived</span>':''}</div><div class="text-xs text-slate-400 truncate">${esc(pv)}</div></div>`;
-  b.onclick=()=>openChat({uid:id,isGroup:c.isGroup,groupName:c.groupName,groupPhoto:c.groupPhoto,members:c.members});box.appendChild(b)})})}
-
-async function openChat(peer){closeChat();
- const isG=peer.isGroup;const id=isG?peer.uid:chatId(me.uid,peer.uid);
- if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.pubKey){toast('User not ready');return}}
- return{id:d.id,c,name,pic,pv,t:c.updatedAt?.toMillis?.()||0,isArchived:c.archivedBy?.[me.uid]||false}}));
  rows.sort((a,b)=>b.t-a.t);const box=$('chats');box.innerHTML='';
  if(!rows.length){box.innerHTML='<div class="text-center text-slate-500 text-xs p-8">No chats yet. Search above.</div>';return}
  rows.forEach(({id,c,name,pic,pv,isArchived})=>{
