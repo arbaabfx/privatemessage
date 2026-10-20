@@ -137,7 +137,6 @@ const TERMS=`<div class="p-6 w-[92vw] max-w-md text-sm text-slate-300 space-y-3"
 <button class="g mt-2" onclick="document.getElementById('terms').checked=true;document.getElementById('gbtn').disabled=false;closeModal()">I Agree</button></div>`;
 $('tlink').onclick=()=>modal(TERMS);
 
-// Google Sign-In Robust Button Handler
 $('gbtn').onclick = async () => {
   if (!$('terms').checked) return toast('Please accept Terms & Conditions');
   try {
@@ -198,7 +197,18 @@ function listenChats(){chatsUnsub=onSnapshot(query(collection(db,'chats'),where(
 
 async function openChat(peer){closeChat();
  const isG=peer.isGroup;const id=isG?peer.uid:chatId(me.uid,peer.uid);
- if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.peer.pubKey){toast('User not ready');return}}
+ if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.pubKey){toast('User not ready');return}}
+ return{id:d.id,c,name,pic,pv,t:c.updatedAt?.toMillis?.()||0,isArchived:c.archivedBy?.[me.uid]||false}}));
+ rows.sort((a,b)=>b.t-a.t);const box=$('chats');box.innerHTML='';
+ if(!rows.length){box.innerHTML='<div class="text-center text-slate-500 text-xs p-8">No chats yet. Search above.</div>';return}
+ rows.forEach(({id,c,name,pic,pv,isArchived})=>{
+  const b=document.createElement('button');b.className='row';if(isArchived)b.style.opacity='0.5';
+  b.innerHTML=`<img src="${esc(pic)}" class="av w-11 h-11"><div class="min-w-0 flex-1 border-b border-slate-800 pb-2"><div class="font-medium text-sm text-white truncate flex justify-between"><span>${esc(name)}</span>${isArchived?'<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">Archived</span>':''}</div><div class="text-xs text-slate-400 truncate">${esc(pv)}</div></div>`;
+  b.onclick=()=>openChat({uid:id,isGroup:c.isGroup,groupName:c.groupName,groupPhoto:c.groupPhoto,members:c.members});box.appendChild(b)})})}
+
+async function openChat(peer){closeChat();
+ const isG=peer.isGroup;const id=isG?peer.uid:chatId(me.uid,peer.uid);
+ if(!isG){await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});peer=await getUser(peer.uid);if(!peer.pubKey){toast('User not ready');return}}
  const c=cur={id,peer,isGroup:isG,key:isG?null:await keyFor(peer),iBlocked:false,blockedMe:false,cache:new Map(),meta:new Map()};
  $('empty').classList.add('hidden');$('chat').classList.remove('hidden');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||''):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';applyTheme();
  if(!isG){unsubs.push(onSnapshot(doc(db,'users',peer.uid),s=>{if(cur!==c)return;c.peer={uid:peer.uid,...s.data()};userCache.set(peer.uid,c.peer);$('pseen').textContent=ago(s.data()?.lastActive);$('pname').textContent=nm(c.peer);$('pimg').src=avatar(c.peer)}))}
@@ -230,7 +240,7 @@ async function post(c,type,url,meta,label){
  else{const e=await encrypt(c.key,JSON.stringify(meta)),p=await encrypt(c.key,label),data={from:me.uid,ct:e.ct,iv:e.iv,ts:serverTimestamp(),type};if(url)data.url=url;
   await addDoc(collection(db,'chats',c.id,'messages'),data);updateDoc(doc(db,'chats',c.id),{updatedAt:serverTimestamp(),pv:p}).catch(()=>{})}
 }
-async function send(){const t=$('msg').value.trim();if(!t\vert{}\vert{}!cur)return;$('msg').value='';try{await post(cur,'text',null,{t},t.slice(0,60))}catch{toast('Send failed')}}
+async function send(){const t=$('msg').value.trim();if(!t \vert{}\vert{} !cur)return;$('msg').value='';try{await post(cur,'text',null,{t},t.slice(0,60))}catch{toast('Send failed')}}
 $('send').onclick=send;$('msg').onkeydown=e=>{if(e.key==='Enter'&&S.enter)send()};
 async function sendFile(f){if(!f||!cur)return;if(f.size>25e6)return toast('Max 25MB');const type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':'file';let blob=f;if(type==='image'&&f.type!=='image/gif'){try{blob=await shrink(f)}catch{}}
  const task=uploadBytesResumable(ref(storage,`chats/${cur.id}/${me.uid}_${Date.now()}`),blob);$('prog').classList.remove('hidden');
