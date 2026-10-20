@@ -50,7 +50,7 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 @keyframes fl{50%{transform:perspective(500px) translate3d(0,-10px,40px) rotateY(-12deg)}}
 @media(max-width:720px){#card{height:auto;display:flex;flex-direction:column}.rpw{position:relative;order:-1;height:190px;inset:auto}.rp{clip-path:polygon(0 0,100% 0,100% 80%,0 100%)}.rt{width:60%;top:46%}.lp{position:relative;width:100%;padding:18px 28px 34px}}
 /* app */
- #app{position:fixed;inset:0;display:flex;background:var(--bg);animation:appIn .7s cubic-bezier(.2,.9,.3,1) both}
+#app{position:fixed;inset:0;display:flex;background:var(--bg);animation:appIn .7s cubic-bezier(.2,.9,.3,1) both}
 @keyframes appIn{from{opacity:0;transform:perspective(1200px) rotateX(6deg) scale(.97)}}
 #side{width:370px;background:var(--pn);border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
 #main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:var(--bg)}
@@ -130,6 +130,7 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
    <p id="lerr"></p></div>
   <div class="rpw"><div class="rp"><span class="fb" style="right:9%;top:12%">Hey, are you there?</span><span class="fb" style="right:24%;top:26%;animation-delay:-1.5s">Photos, files, groups</span><div class="rt"><h3>Welcome back!</h3><p>Your chats are encrypted and waiting for you.</p></div></div></div>
  </div></div>
+
  <div id="setup" class="h" style="position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg)">
  <div class="mc" style="text-align:center"><h2 style="margin-bottom:4px">Choose a username</h2><small style="margin-bottom:16px">3–20 letters, numbers or underscore</small>
   <input id="uname" class="inp" maxlength="20" placeholder="username" autocomplete="off"><p id="uerr" style="color:#ff7a90;font-size:12px;min-height:22px;margin:6px 0"></p>
@@ -221,25 +222,29 @@ async function decrypt(key,m){if(!m)return'Unable to read';if(m.iv===PLAIN_IV){t
 let me,profile,cur,unsubs=[],chatsUnsub,presence,userCache=new Map(),tokR=0,arcOnly=false,lastRows=[],booted=false;
 const RD=JSON.parse(localStorage.getItem('abchat_rd')||'{}');const markRead=id=>{RD[id]=Date.now();localStorage.setItem('abchat_rd',JSON.stringify(RD))};
 const chatId=(a,b)=>[a,b].sort().join('_');
+
 async function getUser(uid){
-  if (!uid) return { name: 'Unknown user', username: 'unknown', photoURL: '' };
-  if (!userCache.has(uid)) {
-    try {
-      const s = await getDoc(doc(db, 'users', uid));
-      if (s.exists() && s.data()) {
-        userCache.set(uid, { uid, ...s.data() });
-      } else {
-        userCache.set(uid, { uid, name: 'Unknown user', username: 'unknown', photoURL: '' });
-      }
-    } catch (e) {
-      userCache.set(uid, { uid, name: 'Unknown user', username: 'unknown', photoURL: '' });
+  if(!uid) return null;
+  if(userCache.has(uid)) return userCache.get(uid);
+  try{
+    const s = await getDoc(doc(db,'users',uid));
+    if(!s.exists()){
+      const fallback = {uid, name:'Unknown user', username:'unknown', photoURL:''};
+      userCache.set(uid, fallback);
+      return fallback;
     }
+    const u = {uid, ...s.data()};
+    userCache.set(uid, u);
+    return u;
+  }catch{
+    const fallback = {uid, name:'Unknown user', username:'unknown', photoURL:''};
+    userCache.set(uid, fallback);
+    return fallback;
   }
-  return userCache.get(uid);
 }
 
-/* ===== login ===== */
- $('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};$('tlink').onclick=e=>{e.preventDefault();modal(`<h3 style="margin-bottom:10px">Terms &amp; Conditions</h3><p style="font-size:13px;color:var(--mu)"><b>Usage:</b> Use abchat responsibly. No spam or malicious content.<br><br><b>Privacy:</b> Direct messages are end-to-end encrypted between your devices.</p><button id="tok" class="pr" style="margin-top:16px">I agree</button>`);$('tok').onclick=()=>{$('terms').checked=true;$('gbtn').disabled=false;closeModal()}};
+ /* ===== login ===== */
+$('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};$('tlink').onclick=e=>{e.preventDefault();modal(`<h3 style="margin-bottom:10px">Terms &amp; Conditions</h3><p style="font-size:13px;color:var(--mu)"><b>Usage:</b> Use abchat responsibly. No spam or malicious content.<br><br><b>Privacy:</b> Direct messages are end-to-end encrypted between your devices.</p><button id="tok" class="pr" style="margin-top:16px">I agree</button>`);$('tok').onclick=()=>{$('terms').checked=true;$('gbtn').disabled=false;closeModal()}};
 $('gbtn').onclick=async e=>{e.preventDefault();if(!$('terms').checked)return toast('Please accept the Terms first');
  const err=$('lerr');err.textContent='';btnLoad($('gbtn'),true,'Opening Google');const p=new GoogleAuthProvider();
  try{await signInWithPopup(auth,p)}catch(pe){const c=pe?.code||'';
@@ -286,16 +291,24 @@ $('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().toLowerCa
   found.forEach(u=>{userCache.set(u.uid,u);const b=document.createElement('button');b.className='row';b.innerHTML=`<img src="${esc(avatar(u))}" class="av"><div class="nm"><b>${esc(nm(u))}</b><small>@${esc(u.username)}</small></div>`;b.onclick=()=>{$('search').value='';r.innerHTML='';openChat(u)};r.appendChild(b)});
   if(!found.size)r.innerHTML='<div class="empty">No user found for “'+esc(q)+'”. Check the username spelling.</div>'},250)};
 
-/* ===== chat list ===== */
+/* ===== chat list (Safely filtered) ===== */
 const pvCache=new Map();let prevT=new Map(),firstList=true;
 function listenChats(){firstList=true;prevT=new Map();chatsUnsub=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),async snap=>{
  const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data({serverTimestamps:'estimate'}),isG=c.isGroup;let name=c.groupName||'Group',pic='',pv=isG?`${c.members.length} members`:'Say hi 👋';
-  if(isG)pic=c.groupPhoto||avatar({name});else{const p=await getUser(c.members.find(x=>x!==me.uid)).catch(()=>null);name=p?nm(p):'Unknown user';pic=avatar(p||{name});
-   if(c.pv&&p?.pubKey){const ck=d.id+c.pv.ct;if(!pvCache.has(ck)){let t=await decrypt(await keyFor(p).catch(()=>null),c.pv);pvCache.set(ck,t.startsWith('🔒')?'🔒 Encrypted':t)}pv=pvCache.get(ck)}}
+  if(isG){
+    pic=c.groupPhoto||avatar({name});
+  }else{
+    const peerUid = (c.members||[]).find(x=>x!==me.uid);
+    if(!peerUid) return null;
+    const p=await getUser(peerUid).catch(()=>null);
+    if(!p || !p.username || p.username==='unknown') return null; // Auto-skip invalid/junk chats
+    name=nm(p);pic=avatar(p);
+    if(c.pv&&p?.pubKey){const ck=d.id+c.pv.ct;if(!pvCache.has(ck)){let t=await decrypt(await keyFor(p).catch(()=>null),c.pv);pvCache.set(ck,t.startsWith('🔒')?'🔒 Encrypted':t)}pv=pvCache.get(ck)}
+  }
   const t=c.updatedAt?.toMillis?.()||0,unread=!!c.lastFrom&&c.lastFrom!==me.uid&&t>(RD[d.id]||0)&&cur?.id!==d.id;
   if(!firstList&&unread&&t>(prevT.get(d.id)||0))notify(name,pic,pv,{uid:d.id,isGroup:isG,groupName:c.groupName,groupPhoto:c.groupPhoto,members:c.members});
   prevT.set(d.id,t);return{id:d.id,c,name,pic,pv,t,unread,isArchived:c.archivedBy?.[me.uid]||false}}));
- firstList=false;rows.sort((a,b)=>b.t-a.t);lastRows=rows;paintChats(rows)})}
+ const validRows=rows.filter(Boolean);firstList=false;validRows.sort((a,b)=>b.t-a.t);lastRows=validRows;paintChats(validRows)})}
 function paintChats(rows){const box=$('chats'),list=(rows||[]).filter(r=>arcOnly?r.isArchived:!r.isArchived),f=document.createDocumentFragment();
  if(!list.length){box.innerHTML=`<div class="empty">${arcOnly?'No archived chats.':'No chats yet. Search a username above.'}</div>`;return}
  list.forEach(({id,c,name,pic,pv,unread,isArchived},i)=>{const b=document.createElement('button');b.className='row';b.style.animationDelay=Math.min(i,10)*40+'ms';
@@ -309,7 +322,7 @@ let ntT;function notify(name,pic,pv,peer){chime();
 
 /* ===== open chat ===== */
 async function openChat(peer){closeChat();const isG=peer.isGroup,id=isG?peer.uid:chatId(me.uid,peer.uid);
- if(!isG){try{const u=await getUser(peer.uid);if(!u||!u.username)return toast('User not found. Their profile may not be set up yet.');peer=u;
+ if(!isG){try{const u=await getUser(peer.uid);if(!u||!u.username||u.username==='unknown')return toast('User not found or profile not set up.');peer=u;
    await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true})}catch(e){return toast('Could not open chat: '+e.message)}}
  const c=cur={id,peer,isGroup:isG,key:(!isG&&HAS_CRYPTO&&peer.pubKey&&peer.pubKey!=='fallback')?await keyFor(peer).catch(()=>null):null,cache:new Map(),els:new Map(),txt:new Map(),typing:false,init:false,reply:null};
  $('emp').classList.add('h');$('chat').classList.remove('h');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||avatar({name:peer.groupName})):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';clearReply();markRead(id);
@@ -352,6 +365,7 @@ $('msgs').onclick=e=>{const a=e.target.closest('[data-a]'),im=e.target.dataset.i
   if(k==='d'&&confirm('Delete message?'))deleteDoc(doc(db,'chats',cur.id,'messages',id)).catch(()=>toast('Delete failed'));return}
  const b=e.target.closest('.bub');document.querySelectorAll('.bub.sel').forEach(x=>x!==b&&x.classList.remove('sel'));b?.classList.toggle('sel')};
 function clearReply(){if(cur)cur.reply=null;$('rb').classList.add('h')}$('rbx').onclick=clearReply;
+
 async function post(c,type,url,meta,pv,gct){
  if(c.isGroup){await addDoc(collection(db,'chats',c.id,'messages'),{from:me.uid,ct:gct??pv,ts:serverTimestamp(),type,url:url||null});updateDoc(doc(db,'chats',c.id),{updatedAt:serverTimestamp()}).catch(()=>{})}
  else{const e=await encrypt(c.key,JSON.stringify(meta)),p=await encrypt(c.key,pv),data={from:me.uid,ct:e.ct,iv:e.iv,ts:serverTimestamp(),type};if(url)data.url=url;
@@ -382,7 +396,7 @@ $('grpbtn').onclick=()=>{modal(`<h3 style="margin-bottom:12px">New group</h3><in
    await setDoc(doc(db,'chats','g_'+Date.now()),{isGroup:true,groupName:name,members:[...new Set(uids)],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
    closeModal();toast(miss.length?'Group created. Not found: '+miss.join(', '):'Group created')}catch(e){toast('Failed: '+e.message)}}};
 
-/* ===== settings page ===== */
+ /* ===== settings page ===== */
 const swr=(k,t,s)=>`<div class="st"><div><b>${t}</b><small>${s}</small></div><button class="sw ${S[k]?'on':''}" data-k="${k}"></button></div>`;
 const sec=(i,ico,t,s,b)=>`<section class="acc" style="--d:${80+i*70}ms"><button class="ah" type="button"><span class="ci">${ic(ico)}</span><span>${t}<small>${s}</small></span><span class="ch">${ic('down')}</span></button><div class="bd"><div><div class="bi">${b}</div></div></div></section>`;
 function openSettings(){const sp=$('sp');
@@ -429,4 +443,4 @@ async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getD
   for(const p of P){if(S.fx3d)p.z-=.0035;if(p.z<=.02){p.z=1;p.x=Math.random()*2-1;p.y=Math.random()*2-1}
    const k=.45/p.z,sx=W/2+(p.x-mx*.3)*W*k*.5,sy=H/2+(p.y-my*.3)*H*k*.5;x.globalAlpha=Math.min(1,(1-p.z)*1.2);x.beginPath();x.arc(sx,sy,(1-p.z)*2.6+.4,0,6.3);x.fill()}x.globalAlpha=1}
   requestAnimationFrame(f)})()})();
-</script></body></html> 
+</script></body></html>
