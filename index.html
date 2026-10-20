@@ -30,7 +30,7 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .inp{width:100%;height:44px;border-radius:999px;border:1px solid var(--bd);background:var(--pn2);padding:0 16px;outline:0;transition:.25s}
 .inp:focus{border-color:var(--ac);box-shadow:0 0 16px -4px var(--ac)}
 .av{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--ac);flex-shrink:0;background:var(--pn2)}
-/* login */
+
 #login{position:fixed;inset:0;z-index:20;display:grid;place-items:center;perspective:1200px;background:radial-gradient(circle at 50% 40%,#073049,#021520 72%);overflow:hidden}
 #fx{position:absolute;inset:0;width:100%;height:100%}
 #card{position:relative;width:min(860px,92vw);height:430px;border:1px solid var(--ac);background:rgba(3,26,40,.7);box-shadow:0 0 16px var(--ac),0 0 70px -12px var(--ac),inset 0 0 40px -22px var(--ac);transform-style:preserve-3d;transition:transform .2s ease-out;animation:cin 1.1s cubic-bezier(.2,.9,.3,1) backwards;color:#e8fbff}
@@ -49,7 +49,7 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .fb{position:absolute;padding:7px 13px;border-radius:14px 14px 4px 14px;background:rgba(255,255,255,.2);font-size:11.5px;color:#fff;animation:fl 4s ease-in-out infinite;white-space:nowrap}
 @keyframes fl{50%{transform:perspective(500px) translate3d(0,-10px,40px) rotateY(-12deg)}}
 @media(max-width:720px){#card{height:auto;display:flex;flex-direction:column}.rpw{position:relative;order:-1;height:190px;inset:auto}.rp{clip-path:polygon(0 0,100% 0,100% 80%,0 100%)}.rt{width:60%;top:46%}.lp{position:relative;width:100%;padding:18px 28px 34px}}
-/* app */
+
 #app{position:fixed;inset:0;display:flex;background:var(--bg);animation:appIn .7s cubic-bezier(.2,.9,.3,1) both}
 @keyframes appIn{from{opacity:0;transform:perspective(1200px) rotateX(6deg) scale(.97)}}
 #side{width:370px;background:var(--pn);border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
@@ -97,7 +97,7 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .mn{position:absolute;bottom:70px;left:12px;background:var(--pn);border:1px solid var(--bd);border-radius:18px;padding:8px;z-index:6;animation:pop .35s cubic-bezier(.3,1.5,.5,1) both;transform-origin:bottom left;box-shadow:0 20px 50px -20px #000}
 #emenu{display:flex;flex-wrap:wrap;gap:2px;width:268px}#emenu button{width:40px;height:40px;font-size:21px;border-radius:10px;transition:.15s}#emenu button:hover{background:var(--pn2);transform:scale(1.25)}
 #amenu button{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;width:100%;font-size:13px}#amenu button:hover{background:var(--pn2);color:var(--ac)}
-/* settings page */
+
 #sp{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;transform:perspective(1500px) translateX(105%) rotateY(-30deg);transform-origin:100% 50%;opacity:0;visibility:hidden;transition:transform .65s cubic-bezier(.2,.9,.3,1),opacity .4s,visibility 0s .65s}
 #sp.on{transform:none;opacity:1;visibility:visible;transition-delay:0s}
 .wrap{max-width:640px;margin:auto;padding:0 16px 60px}.sbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:14px;padding:14px 0;background:var(--bg)}.sbar h2{font-size:22px}
@@ -169,7 +169,7 @@ import {getStorage,ref,uploadBytesResumable,getDownloadURL} from "https://www.gs
 const firebaseConfig={apiKey:"AIzaSyC8_li0jyr4R1Ov5KLZmv5lzsx7VoevYW4",authDomain:"chatly-eb71a.firebaseapp.com",projectId:"chatly-eb71a",storageBucket:"chatly-eb71a.firebasestorage.app",messagingSenderId:"750656487876",appId:"1:750656487876:web:c3b703c5bdada4b0496491"};
 const ADMIN_EMAIL="arbaab9089@gmail.com";
 const $=i=>document.getElementById(i);
-const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
+const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
 const ic=n=>`<svg viewBox="0 0 24 24">${I[n]}</svg>`;
 const icons=r=>(r||document).querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));icons();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -224,7 +224,7 @@ const RD=JSON.parse(localStorage.getItem('abchat_rd')||'{}');const markRead=id=>
 const chatId=(a,b)=>[a,b].sort().join('_');
 
 async function getUser(uid){
-  if(!uid) return null;
+  if(!uid || uid === 'undefined') return null;
   if(userCache.has(uid)) return userCache.get(uid);
   try{
     const s = await getDoc(doc(db,'users',uid));
@@ -280,7 +280,7 @@ async function boot(){if(booted)return;booted=true;await initKeys(me.uid);
 const paintMe=()=>{$('myimg').src=avatar(profile);$('myname').textContent=nm(profile)};
 $('myimg').onclick=$('setbtn').onclick=()=>openSettings();
 
- /* ===== search ===== */
+/* ===== search ===== */
 let st;$('arcview').onclick=()=>{arcOnly=!arcOnly;$('arcview-txt').textContent=arcOnly?'Show all chats':'Show archived chats';paintChats(lastRows)};
 $('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().toLowerCase().replace(/^@/,''),r=$('results');if(!q){r.innerHTML='';return}
  st=setTimeout(async()=>{const found=new Map(),add=d=>{if(d.id!==me.uid)found.set(d.id,{uid:d.id,...d.data()})};
@@ -290,7 +290,7 @@ $('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().toLowerCa
   found.forEach(u=>{userCache.set(u.uid,u);const b=document.createElement('button');b.className='row';b.innerHTML=`<img src="${esc(avatar(u))}" class="av"><div class="nm"><b>${esc(nm(u))}</b><small>@${esc(u.username)}</small></div>`;b.onclick=()=>{$('search').value='';r.innerHTML='';openChat(u)};r.appendChild(b)});
   if(!found.size)r.innerHTML='<div class="empty">No user found for “'+esc(q)+'”. Check the username spelling.</div>'},250)};
 
-/* ===== chat list (Strict Filter) ===== */
+/* ===== chat list (Self-Chat and Orphan Filter) ===== */
 const pvCache=new Map();let prevT=new Map(),firstList=true;
 function listenChats(){firstList=true;prevT=new Map();chatsUnsub=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),async snap=>{
  const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data({serverTimestamps:'estimate'}),isG=c.isGroup;let name=c.groupName||'Group',pic='',pv=isG?`${c.members.length} members`:'Say hi 👋';
@@ -299,9 +299,9 @@ function listenChats(){firstList=true;prevT=new Map();chatsUnsub=onSnapshot(quer
     pic=c.groupPhoto||avatar({name});
   }else{
     peerUid = (c.members||[]).find(x=>x!==me.uid);
-    if(!peerUid) return null;
+    if(!peerUid || peerUid === me.uid) return null;
     const p=await getUser(peerUid).catch(()=>null);
-    if(!p || !p.username) return null; // Completely ignore invalid/deleted user chats
+    if(!p || !p.username) return null;
     name=nm(p);pic=avatar(p);
     if(c.pv&&p?.pubKey){const ck=d.id+c.pv.ct;if(!pvCache.has(ck)){let t=await decrypt(await keyFor(p).catch(()=>null),c.pv);pvCache.set(ck,t.startsWith('🔒')?'🔒 Encrypted':t)}pv=pvCache.get(ck)}
   }
@@ -328,6 +328,10 @@ async function openChat(peerArg){
  const id = isG ? peer.uid : chatId(me.uid, peer.uid);
  
  if(!isG){
+   if(!peer.uid || peer.uid === me.uid){
+     toast('Invalid chat profile.');
+     return;
+   }
    try{
      const u = await getUser(peer.uid);
      if(!u || !u.username){
@@ -340,7 +344,7 @@ async function openChat(peerArg){
      return toast('Could not open chat: '+e.message);
    }
  }
- 
+
  const c=cur={id,peer,isGroup:isG,key:(!isG&&HAS_CRYPTO&&peer.pubKey&&peer.pubKey!=='fallback')?await keyFor(peer).catch(()=>null):null,cache:new Map(),els:new Map(),txt:new Map(),typing:false,init:false,reply:null};
  $('emp').classList.add('h');$('chat').classList.remove('h');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||avatar({name:peer.groupName})):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';clearReply();markRead(id);
  if(!isG){unsubs.push(onSnapshot(doc(db,'users',peer.uid),s=>{if(cur!==c||!s.exists())return;c.peer={uid:peer.uid,...s.data()};userCache.set(peer.uid,c.peer);if(!c.typing)$('pseen').textContent=ago(s.data().lastActive);$('pname').textContent=nm(c.peer);$('pimg').src=avatar(c.peer)}));
