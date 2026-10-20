@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chatly</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+html,body{height:100%;margin:0;background:#f0f2f5;color:#111b21;font-family:Inter,system-ui,sans-serif}
+.hidden{display:none!important}
+.g{background:#00a884;color:#fff;border-radius:999px;padding:.55rem 1.2rem;font-weight:600;transition:.15s}.g:hover{background:#008f72}.g:disabled{opacity:.5}
+.ic{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:.15s;font-size:20px}.ic:hover{background:rgba(0,0,0,.07)}
+.inp{background:#fff;border:1px solid #d1d7db;border-radius:10px;padding:.6rem .8rem;width:100%;outline:none}.inp:focus{border-color:#00a884;box-shadow:0 0 0 3px rgba(0,168,132,.15)}
+.row{display:flex;align-items:center;gap:12px;padding:10px 14px;width:100%;text-align:left;cursor:pointer;transition:.12s}.row:hover{background:#f5f6f6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#c5cbcf;border-radius:6px}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.pop{animation:pop .18s ease-out}
+#msgs{background:#efeae2 radial-gradient(#e1d9cd 1px,transparent 1px) 0 0/22px 22px}
+.out{background:#d9fdd3;border-radius:12px 0 12px 12px}.in{background:#fff;border-radius:0 12px 12px 12px}
+.bub{box-shadow:0 1px 1px rgba(0,0,0,.12);padding:6px 9px;max-width:80%;word-break:break-word;white-space:pre-wrap}
+.av{border-radius:50%;object-fit:cover;background:#dfe5e7;flex-shrink:0}
+@media(max-width:767px){#main{display:none}#app.open #main{display:flex}#app.open #side{display:none}}
+</style></head>
+<body>
+<div id="login" class="h-full flex items-center justify-center p-4 bg-gradient-to-br from-[#d9fdd3] to-[#f0f2f5]">
+ <div class="bg-white rounded-3xl shadow-xl p-9 text-center max-w-sm w-full pop">
+  <div class="w-16 h-16 mx-auto rounded-full bg-[#00a884] text-white text-3xl flex items-center justify-center mb-3">💬</div>
+  <h1 class="text-2xl font-bold">Chatly</h1><p class="text-gray-500 text-sm my-3">Simple, fast & private messaging</p>
+  <button id="gbtn" class="g w-full">Continue with Google</button>
+  <p id="lerr" class="text-red-600 text-sm mt-4"></p>
+ </div></div>
+
+<div id="setup" class="hidden h-full flex items-center justify-center p-4">
+ <div class="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full pop">
+  <h2 class="text-xl font-semibold mb-1">Choose a username</h2><p class="text-gray-500 text-sm mb-4">3–20 letters, numbers or _ (unique)</p>
+  <input id="uname" class="inp mb-2" maxlength="20" placeholder="username" autocomplete="off">
+  <p id="uerr" class="text-red-600 text-sm h-5 mb-2"></p><button id="ubtn" class="g w-full">Continue</button>
+ </div></div>
+
+<div id="app" class="hidden h-full flex">
+ <aside id="side" class="w-full md:w-[400px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+  <div class="h-14 px-3 bg-[#f0f2f5] flex items-center gap-3">
+   <img id="myimg" class="av w-10 h-10 cursor-pointer" alt="">
+   <div id="myname" class="flex-1 font-semibold truncate"></div>
+   <button id="setbtn" class="ic" title="Settings">⚙️</button>
+  </div>
+  <div class="p-2"><input id="search" class="inp !rounded-full !bg-[#f0f2f5] !border-0" placeholder="🔍  Search username to start a chat" autocomplete="off"><div id="results"></div></div>
+  <div id="chats" class="flex-1 overflow-y-auto"></div>
+ </aside>
+ <main id="main" class="flex-1 flex-col min-w-0 flex">
+  <div id="empty" class="m-auto text-center text-gray-500 p-6"><div class="text-6xl mb-3">💬</div><div class="text-lg font-medium text-gray-700">Chatly</div>Search a username on the left to start chatting.</div>
+  <div id="chat" class="hidden flex-1 flex-col min-h-0 flex">
+   <div id="hdr" class="h-14 px-2 bg-[#f0f2f5] flex items-center gap-2 cursor-pointer">
+    <button id="back" class="ic md:hidden">←</button><img id="pimg" class="av w-10 h-10" alt="">
+    <div class="min-w-0"><div id="pname" class="font-semibold truncate"></div><div id="pseen" class="text-xs text-gray-500"></div></div>
+   </div>
+   <div id="msgs" class="flex-1 overflow-y-auto px-3 md:px-12 py-3 space-y-1"></div>
+   <div id="prog" class="hidden h-1 bg-gray-200"><div id="bar" class="h-1 bg-[#00a884] transition-all" style="width:0"></div></div>
+   <div id="blockedmsg" class="hidden text-center text-sm text-red-600 bg-red-50 py-2"></div>
+   <div class="relative px-2 py-2 bg-[#f0f2f5] flex items-center gap-1">
+    <div id="emenu" class="hidden absolute bottom-16 left-2 bg-white rounded-xl shadow-xl p-2 w-64 flex flex-wrap pop"></div>
+    <div id="amenu" class="hidden absolute bottom-16 left-12 bg-white rounded-xl shadow-xl py-1 pop"><button id="apic" class="row">🖼️ Photo / Video</button><button id="adoc" class="row">📄 Document</button></div>
+    <button id="ebtn" class="ic">😊</button><button id="abtn" class="ic">📎</button>
+    <input id="msg" class="inp !rounded-full" placeholder="Type a message" autocomplete="off" maxlength="2000">
+    <button id="send" class="ic !bg-[#00a884] !text-white">➤</button>
+   </div>
+  </div>
+ </main>
+</div>
+<input id="fmedia" type="file" accept="image/*,video/*" class="hidden"><input id="fdoc" type="file" class="hidden"><input id="favatar" type="file" accept="image/*" class="hidden">
+<div id="modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3"></div>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white rounded-full px-4 py-2 text-sm hidden"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getStorage,ref,uploadBytesResumable,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+/* ====== 1) PASTE YOUR FIREBASE CONFIG  2) SET ADMIN EMAIL ====== */
+const firebaseConfig={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT",storageBucket:"YOUR_PROJECT.appspot.com",appId:"YOUR_APP_ID"};
+const ADMIN_EMAIL="admin@example.com";
+/* ================================================================ */
+
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.add('hidden'),3200)};
+const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+const modal=h=>{$('modal').innerHTML=`<div class="bg-white rounded-2xl shadow-2xl max-h-[92vh] overflow-auto pop">${h}</div>`;$('modal').classList.remove('hidden')};
+const closeModal=()=>$('modal').classList.add('hidden');$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+const S=Object.assign({sound:true,enter:true},JSON.parse(localStorage.getItem('chatly_s')||'{}'));
+const beep=()=>{try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.05;o.start();o.stop(a.currentTime+.12)}catch{}};
+const ago=ts=>{if(!ts)return'';const s=(Date.now()-ts.toDate())/1e3;return s<90?'online':s<3600?'last seen '+Math.floor(s/60)+'m ago':s<86400?'last seen '+Math.floor(s/3600)+'h ago':'last seen '+ts.toDate().toLocaleDateString()};
+const avatar=u=>u?.photoURL||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#cfd8dc"/><text x="20" y="27" font-size="19" text-anchor="middle" fill="#fff" font-family="Arial">'+esc((u?.name||u?.username||'?')[0]?.toUpperCase())+'</text></svg>');
+const nm=u=>u?.name||u?.username||'User';
+const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDateString()===t.toDateString()?'Today':d.toDateString()===y.toDateString()?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
+const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+
+if(location.protocol==='file:')$('lerr').textContent='Google sign-in needs http(s). Host on GitHub Pages or run a local server (localhost).';
+else if(firebaseConfig.apiKey.startsWith('YOUR'))$('lerr').textContent='Firebase config missing: paste your real firebaseConfig at the top of the script.';
+let app,auth,db,storage;
+try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app)}catch(e){$('lerr').textContent='Firebase init failed: '+e.message}
+
+/* ---- Images ---- */
+const loadImg=f=>new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=URL.createObjectURL(f)});
+async function avatarData(f){const i=await loadImg(f),s=Math.min(i.width,i.height),c=document.createElement('canvas');c.width=c.height=256;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,256,256);return c.toDataURL('image/jpeg',.8)}
+async function shrink(f){const i=await loadImg(f),k=Math.min(1,1600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.82))}
+
+/* ---- E2EE for text (ECDH P-256 -> AES-256-GCM) ---- */
+const te=new TextEncoder(),td=new TextDecoder(),EC={name:'ECDH',namedCurve:'P-256'};
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let myPriv,myPubStr;
+async function initKeys(uid){const k='chatly_keys_'+uid,old='nocturne_keys_'+uid;let s=localStorage.getItem(k)||localStorage.getItem(old);
+ if(!s){const kp=await crypto.subtle.generateKey(EC,true,['deriveKey']);s=JSON.stringify({priv:await crypto.subtle.exportKey('jwk',kp.privateKey),pub:await crypto.subtle.exportKey('jwk',kp.publicKey)})}
+ localStorage.setItem(k,s);const o=JSON.parse(s);myPriv=await crypto.subtle.importKey('jwk',o.priv,EC,false,['deriveKey']);myPubStr=JSON.stringify(o.pub)}
+const keyCache=new Map();
+async function keyFor(p){const id=p.uid+p.pubKey;if(!keyCache.has(id)){const pub=await crypto.subtle.importKey('jwk',JSON.parse(p.pubKey),EC,false,[]);keyCache.set(id,await crypto.subtle.deriveKey({name:'ECDH',public:pub},myPriv,{name:'AES-GCM',length:256},false,['encrypt','decrypt']))}return keyCache.get(id)}
+async function encrypt(key,t){const iv=crypto.getRandomValues(new Uint8Array(12));return{ct:b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,te.encode(t))),iv:b64(iv)}}
+async function decrypt(key,m){try{return td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(m.iv)},key,unb64(m.ct)))}catch{return'🔒 Unable to decrypt'}}
+
+/* ---- Auth ---- */
+let me,profile,cur,unsubs=[],chatsUnsub,presence,userCache=new Map(),tokR=0;
+const hints={'auth/unauthorized-domain':'Firebase Console → Authentication → Settings → Authorized domains: add this site\'s domain.','auth/operation-not-allowed':'Firebase Console → Authentication → Sign-in method: enable Google.','auth/invalid-api-key':'Wrong apiKey in firebaseConfig.','auth/popup-blocked':'Allow popups for this site and retry.','auth/api-key-not-valid.-please-pass-a-valid-api-key.':'Wrong apiKey in firebaseConfig.','auth/configuration-not-found':'Enable Authentication in Firebase Console (Get started).'};
+$('gbtn').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>{if(e.code!=='auth/popup-closed-by-user')$('lerr').textContent=(hints[e.code]||e.message)+' ['+e.code+']'});
+onAuthStateChanged(auth,async u=>{clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();
+ if(!u){me=null;show('login');return}
+ me=u;try{const s=await getDoc(doc(db,'users',u.uid));if(!s.exists()){show('setup');return}
+  profile=s.data();if(profile.disabled){alert('Your account has been disabled by the administrator.');signOut(auth);return}await boot()}
+ catch(e){show('login');$('lerr').textContent='Database error: '+e.message}});
+$('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');err.textContent='';
+ if(!/^[a-z0-9_]{3,20}$/.test(n)){err.textContent='Use 3–20 letters, numbers or _';return}
+ try{await initKeys(me.uid);
+  await runTransaction(db,async tx=>{const ur=doc(db,'usernames',n);if((await tx.get(ur)).exists())throw new Error('taken');
+   tx.set(ur,{uid:me.uid});
+   tx.set(doc(db,'users',me.uid),{username:n,usernameLower:n,name:me.displayName||n,about:'Hey there! I am using Chatly.',photoURL:'',pubKey:myPubStr,lastActive:serverTimestamp(),disabled:false});
+   tx.set(doc(db,'userPrivate',me.uid),{email:me.email,displayName:me.displayName||'',createdAt:serverTimestamp()})});
+  profile=(await getDoc(doc(db,'users',me.uid))).data();await boot()}
+ catch(e){err.textContent=e.message==='taken'?'Username already taken.':'Error: '+e.message}};
+
+async function boot(){await initKeys(me.uid);
+ if(profile.pubKey!==myPubStr){await updateDoc(doc(db,'users',me.uid),{pubKey:myPubStr});profile.pubKey=myPubStr}
+ paintMe();const beat=()=>updateDoc(doc(db,'users',me.uid),{lastActive:serverTimestamp()}).catch(()=>{});beat();presence=setInterval(beat,60000);
+ show('app');$('app').classList.remove('open');listenChats()}
+const paintMe=()=>{$('myimg').src=avatar(profile);$('myname').textContent=nm(profile)};
+$('myimg').onclick=$('setbtn').onclick=()=>settings();
+
+/* ---- Search & chat list ---- */
+async function getUser(uid){if(!userCache.has(uid)){const s=await getDoc(doc(db,'users',uid));userCache.set(uid,{uid,...s.data()})}return userCache.get(uid)}
+const chatId=(a,b)=>[a,b].sort().join('_');
+let st;$('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().toLowerCase(),r=$('results');if(!q){r.innerHTML='';return}
+ st=setTimeout(async()=>{const s=await getDocs(query(collection(db,'users'),where('usernameLower','>=',q),where('usernameLower','<=',q+'\uf8ff'),limit(8)));
+  r.innerHTML='';let n=0;s.forEach(d=>{if(d.id===me.uid)return;n++;const u={uid:d.id,...d.data()};userCache.set(d.id,u);
+   const b=document.createElement('button');b.className='row pop';b.innerHTML=`<img src="${esc(avatar(u))}" class="av w-11 h-11"><div><div class="font-medium">${esc(nm(u))}</div><div class="text-sm text-gray-500">@${esc(u.username)}</div></div>`;
+   b.onclick=()=>{$('search').value='';r.innerHTML='';openChat(u)};r.appendChild(b)});
+  if(!n)r.innerHTML='<div class="text-sm text-gray-500 p-3">No user found. Ask your friend to sign up first.</div>'},250)};
+function listenChats(){chatsUnsub=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),async snap=>{
+ const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data(),p=await getUser(c.members.find(x=>x!==me.uid));let pv='Say hi 👋';
+  if(c.pv&&p.pubKey){pv=await decrypt(await keyFor(p),c.pv);if(pv.startsWith('🔒'))pv='🔒 Encrypted message'}return{p,pv,t:c.updatedAt?.toMillis?.()||0}}));
+ rows.sort((a,b)=>b.t-a.t);const box=$('chats');box.innerHTML='';
+ if(!rows.length)box.innerHTML='<div class="text-center text-gray-400 text-sm p-8">No chats yet.<br>Search a username above.</div>';
+ rows.forEach(({p,pv})=>{const b=document.createElement('button');b.className='row';b.innerHTML=`<img src="${esc(avatar(p))}" class="av w-12 h-12"><div class="min-w-0 flex-1 border-b border-gray-100 pb-2"><div class="font-medium truncate">${esc(nm(p))}</div><div class="text-sm text-gray-500 truncate">${esc(pv)}</div></div>`;b.onclick=()=>openChat(p);box.appendChild(b)})})}
+
+/* ---- Chat ---- */
+function closeChat(){unsubs.forEach(f=>f());unsubs=[];cur=null;$('chat').classList.add('hidden');$('empty').classList.remove('hidden');$('app').classList.remove('open')}
+async function openChat(peer){closeChat();peer=await getUser(peer.uid);if(!peer.pubKey){toast('This user is not ready yet.');return}
+ const id=chatId(me.uid,peer.uid);await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort()},{merge:true});
+ const c=cur={id,peer,key:await keyFor(peer),iBlocked:false,blockedMe:false,cache:new Map(),meta:new Map()};
+ $('empty').classList.add('hidden');$('chat').classList.remove('hidden');$('app').classList.add('open');
+ $('pimg').src=avatar(peer);$('pname').textContent=nm(peer);$('msgs').innerHTML='';
+ unsubs.push(onSnapshot(doc(db,'users',peer.uid),s=>{if(cur!==c)return;c.peer={uid:peer.uid,...s.data()};userCache.set(peer.uid,c.peer);$('pseen').textContent=ago(s.data()?.lastActive);$('pname').textContent=nm(c.peer);$('pimg').src=avatar(c.peer)}));
+ unsubs.push(onSnapshot(collection(db,'chats',id,'blocks'),s=>{if(cur!==c)return;c.iBlocked=s.docs.some(d=>d.id===me.uid);c.blockedMe=s.docs.some(d=>d.id===peer.uid);
+  const bm=$('blockedmsg');bm.classList.toggle('hidden',!(c.iBlocked||c.blockedMe));bm.textContent=c.iBlocked?'You blocked this contact. Open contact info to unblock.':'You can\'t message this contact.';
+  $('send').disabled=$('msg').disabled=c.iBlocked||c.blockedMe}));
+ let first=true;
+ unsubs.push(onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts','desc'),limit(150)),s=>{
+  if(!first&&S.sound&&s.docChanges().some(ch=>ch.type==='added'&&ch.doc.data().from!==me.uid))beep();first=false;render(c,s.docs.slice().reverse())}));
+ $('msg').focus()}
+async function render(c,docs){const tok=++tokR,items=[];
+ for(const d of docs){const m=d.data({serverTimestamps:'estimate'});let x=c.cache.get(d.id);
+  if(!x){let meta;try{meta=JSON.parse(await decrypt(c.key,m))}catch{meta={t:'🔒 Unable to decrypt'}}x=meta;c.cache.set(d.id,x)}c.meta.set(d.id,m);items.push({id:d.id,m,x})}
+ if(tok!==tokR||cur!==c)return;
+ const box=$('msgs'),bottom=box.scrollHeight-box.scrollTop-box.clientHeight<150||!box.dataset.i;let day='',h='';
+ for(const {id,m,x} of items){const d=m.ts?.toDate()||new Date(),dl=dlabel(d),mine=m.from===me.uid;
+  if(dl!==day){day=dl;h+=`<div class="text-center my-2"><span class="bg-white/90 text-xs text-gray-600 rounded-lg px-3 py-1 shadow-sm">${dl}</span></div>`}
+  let body;
+  if(m.type==='image')body=`<img src="${esc(m.url)}" data-img="${esc(m.url)}" class="rounded-lg max-h-72 max-w-full cursor-pointer" loading="lazy">`;
+  else if(m.type==='video')body=`<video controls preload="metadata" src="${esc(m.url)}" class="rounded-lg max-h-72 max-w-full"></video>`;
+  else if(m.type==='file')body=`<a href="${esc(m.url)}" target="_blank" rel="noopener" class="flex items-center gap-2 bg-black/5 rounded-lg p-2 min-w-[200px]"><span class="text-2xl">📄</span><span class="min-w-0"><span class="block truncate text-sm font-medium">${esc(x.n||'Document')}</span><span class="block text-xs text-gray-500">${fsize(x.s||0)} · tap to open</span></span></a>`;
+  else body=esc(x.t);
+  h+=`<div class="flex ${mine?'justify-end':'justify-start'} group pop"><div class="bub ${mine?'out':'in'}">${body}<div class="text-[10px] text-gray-500 text-right mt-0.5">${m.ts?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'⏳'}${mine?`<button data-del="${id}" class="ml-2 opacity-0 group-hover:opacity-100 hover:text-red-600" title="Delete for everyone">🗑</button>`:''}</div></div></div>`}
+ box.innerHTML=h;if(bottom){box.scrollTop=box.scrollHeight;box.dataset.i=1}}
+$('msgs').onclick=e=>{const t=e.target.dataset||{};
+ if(t.img)modal(`<img src="${esc(t.img)}" class="max-w-[94vw] max-h-[88vh] rounded-2xl">`);
+ if(t.del&&confirm('Delete this message for everyone?')){const u=cur.meta.get(t.del)?.url;deleteDoc(doc(db,'chats',cur.id,'messages',t.del)).then(()=>{if(u)deleteObject(ref(storage,u)).catch(()=>{})}).catch(()=>toast('Delete failed'))}};
+async function post(c,type,url,meta,label){const e=await encrypt(c.key,JSON.stringify(meta)),p=await encrypt(c.key,label),data={from:me.uid,ct:e.ct,iv:e.iv,ts:serverTimestamp(),type};if(url)data.url=url;
+ await addDoc(collection(db,'chats',c.id,'messages'),data);updateDoc(doc(db,'chats',c.id),{updatedAt:serverTimestamp(),pv:p}).catch(()=>{})}
+async function send(){const t=$('msg').value.trim();if(!t||!cur)return;if(cur.iBlocked||cur.blockedMe)return toast('Messaging is blocked');$('msg').value='';
+ try{await post(cur,'text',null,{t},t.slice(0,60))}catch{toast('Send failed')}}
+$('send').onclick=send;$('msg').onkeydown=e=>{if(e.key==='Enter'&&S.enter)send()};
+async function sendFile(f){if(!f||!cur)return;const c=cur;if(c.iBlocked||c.blockedMe)return toast('Messaging is blocked');if(f.size>25e6)return toast('Max file size is 25 MB');
+ const type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':'file';let blob=f;
+ if(type==='image'&&f.type!=='image/gif'){try{blob=await shrink(f)}catch{}}
+ const task=uploadBytesResumable(ref(storage,`chats/${c.id}/${me.uid}_${Date.now()}`),blob,{contentType:blob.type||'application/octet-stream'});$('prog').classList.remove('hidden');
+ task.on('state_changed',s=>$('bar').style.width=Math.round(s.bytesTransferred/s.totalBytes*100)+'%',e=>{$('prog').classList.add('hidden');toast('Upload failed: '+e.code)},async()=>{
+  $('prog').classList.add('hidden');$('bar').style.width='0';try{await post(c,type,await getDownloadURL(task.snapshot.ref),{n:f.name,s:f.size},type==='image'?'📷 Photo':type==='video'?'🎥 Video':'📄 '+f.name)}catch{toast('Send failed')}})}
+$('fmedia').onchange=e=>{sendFile(e.target.files[0]);e.target.value=''};$('fdoc').onchange=e=>{sendFile(e.target.files[0]);e.target.value=''};
+$('abtn').onclick=()=>{$('emenu').classList.add('hidden');$('amenu').classList.toggle('hidden')};$('apic').onclick=()=>{$('amenu').classList.add('hidden');$('fmedia').click()};$('adoc').onclick=()=>{$('amenu').classList.add('hidden');$('fdoc').click()};
+'😀 😂 🤣 😍 😘 😎 🥳 😢 😭 😡 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 😴 🙌 😇 🤗 😉 😋 🤩 😬 🙄 👌 ✌️ 💪'.split(' ').forEach(e=>{const b=document.createElement('button');b.className='ic';b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};$('emenu').appendChild(b)});
+$('ebtn').onclick=()=>{$('amenu').classList.add('hidden');$('emenu').classList.toggle('hidden')};
+$('back').onclick=closeChat;
+$('hdr').onclick=e=>{if(e.target.id==='back'||!cur)return;const p=cur.peer;
+ modal(`<div class="p-6 w-[90vw] max-w-sm text-center"><img src="${esc(avatar(p))}" class="av w-32 h-32 mx-auto mb-3"><div class="text-xl font-semibold">${esc(nm(p))}</div><div class="text-gray-500">@${esc(p.username)}</div><div class="text-sm my-3">${esc(p.about||'')}</div><div class="text-xs text-gray-400 mb-4">${esc(ago(p.lastActive))}</div>
+ <button id="blk" class="g !bg-red-600 w-full">${cur.iBlocked?'Unblock':'Block'} contact</button><button class="ic !w-full !rounded-xl mt-2 text-sm" onclick="document.getElementById('modal').classList.add('hidden')">Close</button></div>`);
+ $('blk').onclick=async()=>{const r=doc(db,'chats',cur.id,'blocks',me.uid);try{if(cur.iBlocked){await deleteDoc(r);toast('Unblocked')}else{await setDoc(r,{at:serverTimestamp()});toast('Blocked')}closeModal()}catch{toast('Action failed')}}};
+
+/* ---- Settings / profile ---- */
+function settings(){let newPic=null;
+ modal(`<div class="p-6 w-[92vw] max-w-sm"><h3 class="text-lg font-semibold mb-4">Settings</h3>
+ <div class="text-center mb-4"><img id="sav" src="${esc(avatar(profile))}" class="av w-24 h-24 mx-auto cursor-pointer"><button id="schg" class="text-sm text-[#008069] font-medium mt-1">Change profile photo</button></div>
+ <label class="text-xs text-gray-500">Name</label><input id="sname" class="inp mb-3" maxlength="30" value="${esc(profile.name||'')}">
+ <label class="text-xs text-gray-500">About</label><input id="sabout" class="inp mb-3" maxlength="80" value="${esc(profile.about||'')}">
+ <div class="text-sm text-gray-500 mb-3">Username: @${esc(profile.username)}</div>
+ <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="ssound" ${S.sound?'checked':''}> Message sound</label>
+ <label class="flex items-center gap-2 mb-4"><input type="checkbox" id="senter" ${S.enter?'checked':''}> Press Enter to send</label>
+ <button id="ssave" class="g w-full mb-2">Save</button><button id="sinv" class="ic !w-full !rounded-xl text-sm">🔗 Copy invite link</button>
+ ${me.email===ADMIN_EMAIL?'<button id="sadm" class="ic !w-full !rounded-xl text-sm">🛡️ Admin dashboard</button>':''}
+ <button id="sout" class="ic !w-full !rounded-xl text-sm text-red-600">Sign out</button></div>`);
+ $('schg').onclick=$('sav').onclick=()=>$('favatar').click();
+ $('favatar').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{newPic=await avatarData(f);$('sav').src=newPic}catch{toast('Invalid image')}};
+ $('ssave').onclick=async()=>{const d={name:$('sname').value.trim()||profile.username,about:$('sabout').value.trim()};if(newPic)d.photoURL=newPic;
+  S.sound=$('ssound').checked;S.enter=$('senter').checked;localStorage.setItem('chatly_s',JSON.stringify(S));
+  try{await updateDoc(doc(db,'users',me.uid),d);Object.assign(profile,d);paintMe();closeModal();toast('Saved')}catch{toast('Save failed')}};
+ $('sinv').onclick=()=>{navigator.clipboard?.writeText(location.href.split('#')[0]);toast('Invite link copied')};
+ $('sout').onclick=()=>{closeModal();signOut(auth)};if($('sadm'))$('sadm').onclick=adminPanel}
+
+/* ---- Admin ---- */
+async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;
+ const [us,ps]=await Promise.all([getDocs(collection(db,'users')),getDocs(collection(db,'userPrivate'))]);const priv={};ps.forEach(d=>priv[d.id]=d.data());
+ modal(`<div class="p-5 w-[96vw] max-w-5xl"><div class="flex justify-between mb-3"><h3 class="text-lg font-semibold">Admin dashboard · ${us.size} users</h3><button class="ic" onclick="document.getElementById('modal').classList.add('hidden')">✕</button></div>
+ <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-left text-gray-500"><tr><th class="p-2">User</th><th>Google name</th><th>Email</th><th>Last active</th><th>Status</th><th></th></tr></thead><tbody id="atb">
+ ${us.docs.map(d=>{const u=d.data(),p=priv[d.id]||{};return`<tr class="border-t"><td class="p-2"><div class="flex items-center gap-2"><img src="${esc(avatar(u))}" class="av w-8 h-8">@${esc(u.username)}</div></td><td>${esc(p.displayName)}</td><td>${esc(p.email)}</td><td>${esc(ago(u.lastActive)||'—')}</td><td>${u.disabled?'<b class="text-red-600">Disabled</b>':'<b class="text-green-600">Active</b>'}</td>
+ <td class="whitespace-nowrap">${d.id===me.uid?'':`<button class="ic !w-auto !rounded-lg px-2 text-xs" data-tog="${d.id}" data-d="${u.disabled?1:0}">${u.disabled?'Enable':'Disable'}</button><button class="ic !w-auto !rounded-lg px-2 text-xs text-red-600" data-rm="${d.id}" data-n="${esc(u.usernameLower)}">Delete</button>`}</td></tr>`}).join('')}</tbody></table></div></div>`);
+ $('atb').onclick=async e=>{const t=e.target.dataset;try{
+  if(t.tog)await updateDoc(doc(db,'users',t.tog),{disabled:t.d!=='1'});
+  else if(t.rm&&confirm('Delete this user\'s profile & username? (Remove their login in Firebase Auth console too.)')){const b=writeBatch(db);b.delete(doc(db,'users',t.rm));b.delete(doc(db,'userPrivate',t.rm));b.delete(doc(db,'usernames',t.n));await b.commit()}else return;
+  adminPanel()}catch(err){toast('Failed: '+err.code)}}}
+</script></body></html>
