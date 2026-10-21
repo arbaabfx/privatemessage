@@ -55,7 +55,7 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 #side{width:370px;background:var(--pn);border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
 #main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:var(--bg)}
 .hd{height:66px;padding:0 14px;display:flex;align-items:center;gap:12px;background:var(--pn);border-bottom:1px solid var(--bd);flex-shrink:0}
-.hd .nm{min-width:0;flex:1}.hd .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .nm{min-width:0;flex:1;cursor:pointer}.hd .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .on-d{display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;margin-right:5px;box-shadow:0 0 8px #10b981}
 .row{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;width:100%;text-align:left;transition:.25s;animation:fadeUp .45s both}
 .row:hover{background:var(--pn2);transform:translateX(5px)}.row .nm{min-width:0;flex:1}.row .nm b,.row .nm small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -148,7 +148,7 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
  <main id="main">
   <div id="emp"><div class="cube"><i></i><i></i><i></i><i></i><i></i><i></i></div><b style="font-size:18px;color:var(--tx)">abchat</b><p style="font-size:13px;margin-top:4px">Pick a chat or search a username to start.</p></div>
   <div id="chat" class="h">
-   <div class="hd"><button id="back" class="ib" data-i="back"></button><img id="pimg" class="av" alt=""><div class="nm"><b id="pname"></b><small id="pseen"></small></div><button id="chatopt" class="ib" title="Chat Options" data-i="bell"></button><button id="arcbtn" class="ib" title="Archive" data-i="archive"></button></div>
+   <div class="hd"><button id="back" class="ib" data-i="back"></button><img id="pimg" class="av" alt="" style="cursor:pointer"><div class="nm" id="pinfo-btn"><b id="pname"></b><small id="pseen"></small></div><button id="chatopt" class="ib" title="Chat Options" data-i="bell"></button><button id="arcbtn" class="ib" title="Archive" data-i="archive"></button></div>
    <div id="msgs"></div><button id="dn" class="ib h" data-i="down"></button>
    <div id="prog" class="h"><div id="bar"></div></div>
    <div id="rb" class="h"><div id="rbt"></div><button id="rbx" class="ib" style="width:30px;height:30px" data-i="x"></button></div>
@@ -201,7 +201,7 @@ const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDate
 const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
 
 let app,auth,db,storage;
-try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app);setPersistence(auth,browserLocalPersistence).catch(()=>{})}catch(e){$('lerr').textContent='Firebase init failed: '+e.message}
+try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app);setPersistence(auth,browserLocalPersistence).catch(()=>{})}catch(e){console.error(e)}
 const loadImg=f=>new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=URL.createObjectURL(f)});
 async function scaled(f,max,q,sq){const i=await loadImg(f),c=document.createElement('canvas');if(sq){const s=Math.min(i.width,i.height);c.width=c.height=max;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}else{const k=Math.min(1,max/Math.max(i.width,i.height));c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height)}return{url:c.toDataURL('image/jpeg',q),blob:()=>new Promise(r=>c.toBlob(r,'image/jpeg',q))}}
 
@@ -343,6 +343,26 @@ async function openChat(peerArg){
  unsubs.push(onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts','desc'),limit(150)),s=>render(c,s.docs.slice().reverse())));
  if(innerWidth>767)$('msg').focus()}
 
+// Profile view & reporting modal
+function openProfileModal(){
+  if(!cur)return;
+  if(cur.isGroup){
+    modal(`<div style="text-align:center"><img src="${esc(cur.peer.groupPhoto||avatar({name:cur.peer.groupName}))}" class="av" style="width:72px;height:72px;margin:0 auto 12px"><h3 style="margin-bottom:4px">${esc(cur.peer.groupName)}</h3><small>${cur.peer.members.length} members</small><button class="pr" style="margin-top:20px" onclick="closeModal()">Close</button></div>`);
+  } else {
+    const p=cur.peer;
+    modal(`<div style="text-align:center"><img src="${esc(avatar(p))}" class="av" style="width:72px;height:72px;margin:0 auto 12px"><h3 style="margin-bottom:4px">${esc(nm(p))}</h3><small style="color:var(--ac);margin-bottom:10px">@${esc(p.username||'user')}</small><p style="font-size:13px;color:var(--mu);margin-bottom:16px;background:var(--pn2);padding:10px;border-radius:12px">${esc(p.about||'Hey there! I am using abchat.')}</p><div style="display:flex;gap:10px"><button class="tb dg" id="m-block" style="flex:1">Block</button><button class="tb" id="m-report" style="flex:1;border-color:#f59e0b;color:#f59e0b">Report</button></div><button class="pr" style="margin-top:12px" onclick="closeModal()">Close</button></div>`);
+    $('m-block').onclick=()=>{closeModal();closeChat();toast('User blocked successfully')};
+    $('m-report').onclick=()=>{
+      closeModal();
+      const rUrl=`mailto:${SUP_EMAIL}?subject=Abchat%20User%20Report&body=Reporting%20User:%20${p.username}%20(UID:%20${p.uid})%0AReporter:%20${me.email}%0AReason:%20Violation%20of%20Terms`;
+      location.href=rUrl;
+      toast('Report sent to support email!');
+    };
+  }
+}
+$('pimg').onclick=openProfileModal;
+$('pinfo-btn').onclick=openProfileModal;
+
 async function render(c,docs){const tok=++tokR,items=[];
  for(const d of docs){const m=d.data({serverTimestamps:'estimate'});
   if(c.disappear&&m.ts){const age=(Date.now()-m.ts.toDate())/1e3;if(age>c.disappear){deleteDoc(doc(db,'chats',c.id,'messages',d.id)).catch(()=>{});continue}}
@@ -477,7 +497,7 @@ $('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL
 $('fbg').onchange=async e=>{const f=e.target.files[0];if(f){S.customBg=(await scaled(f,1280,.7)).url;save();applyS();toast('Background set')}e.target.value=''};
 
 async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getDocs(collection(db,'users'));
- modal(`<h3 style="margin-bottom:10px">Admin · ${us.size} users</h3><div style="overflow-x:auto"><table><tbody>${us.docs.docs?.map?.(d=>'')||us.docs.map(d=>{const u=d.data();return`<tr><td>${esc(u.name)}<small>@${esc(u.username)}</small></td><td>${u.disabled?'Disabled':'Active'}</td><td><button class="tb" style="margin:0;padding:6px 10px;min-width:0" data-uid="${d.id}" data-d="${u.disabled?1:0}">${u.disabled?'Enable':'Disable'}</button></td></tr>`}).join('')}</tbody></table></div>`);
+ modal(`<h3 style="margin-bottom:10px">Admin · ${us.size} users</h3><div style="overflow-x:auto"><table><tbody>${us.docs.map(d=>{const u=d.data();return`<tr><td>${esc(u.name)}<small>@${esc(u.username)}</small></td><td>${u.disabled?'Disabled':'Active'}</td><td><button class="tb" style="margin:0;padding:6px 10px;min-width:0" data-uid="${d.id}" data-d="${u.disabled?1:0}">${u.disabled?'Enable':'Disable'}</button></td></tr>`}).join('')}</tbody></table></div>`);
  $('modal').querySelectorAll('[data-uid]').forEach(b=>b.onclick=async()=>{await updateDoc(doc(db,'users',b.dataset.uid),{disabled:b.dataset.d==='1'?false:true});toast('User status updated');adminPanel()})}
 
 (function(){const c=$('fx'),x=c.getContext('2d'),P=[];let W,H,mx=0,my=0;const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener('resize',rs);
