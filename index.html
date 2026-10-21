@@ -186,20 +186,16 @@ try {
 const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('h',x!==id));
 const hideSplash=()=>{const s=$('splash');if(s){s.classList.add('x');setTimeout(()=>s.remove(),500)}};
 
-// Auto-fallback timeout: agar 3 second mein app load na ho toh splash hata kar login dikhao
 setTimeout(()=>{
   hideSplash();
-  const loginEl = $('login');
-  const appEl = $('app');
-  const setupEl = $('setup');
-  if(loginEl && appEl && setupEl && loginEl.classList.contains('h') && appEl.classList.contains('h') && setupEl.classList.contains('h')){
+  if($('login').classList.contains('h') && $('app').classList.contains('h') &&$('setup').classList.contains('h')){
     show('login');
   }
-}, 3000);
+}, 2500);
 
 const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
 const ic=n=>`<svg viewBox="0 0 24 24">${I[n]||''}</svg>`;
-const icons=r=>(r||document).querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));icons();
+document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=s=>s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
 let tt;const toast=m=>{const t=$('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3200)};
@@ -207,7 +203,6 @@ let tt;const toast=m=>{const t=$('toast');if(!t)return;t.textContent=m;t.classLi
 const modal=h=>{$('modal').innerHTML=`<div class="mc">${h}</div>`;$('modal').classList.remove('h')};
 const closeModal=()=>$('modal').classList.add('h');$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 const btnLoad=(b,on,t)=>{if(!b)return;if(on){b.dataset.o=b.innerHTML;b.disabled=true;b.innerHTML='<span class="spin"></span>'+(t||'Please wait')}else{b.disabled=false;if(b.dataset.o)b.innerHTML=b.dataset.o}};
-document.addEventListener('click',e=>{const b=e.target.closest('.pr');if(!b||b.disabled)return;const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*1.4,s=document.createElement('span');s.className='rip';s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;b.appendChild(s);setTimeout(()=>s.remove(),550)});
 
 const ACS={cyan:['#00f2fe','#4facfe'],violet:['#a78bfa','#6d3fe0'],pink:['#ff5ea8','#c81e72'],green:['#10b981','#059669'],amber:['#f59e0b','#d97706']};
 const S=Object.assign({sound:1,enter:1,theme:'neon',ac:'cyan',fs:15,fx3d:1,desk:0,pop:1,customBg:''},JSON.parse(localStorage.getItem('abchat_s')||'{}'));
@@ -272,7 +267,15 @@ if($('gbtn')) $('gbtn').onclick=async e=>{
     await signInWithPopup(auth,p);
   }catch(pe){
     const c=pe?.code||'';
-    if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'){ btnLoad($('gbtn'),false); return; }
+    if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'||c==='auth/popup-blocked'){ 
+      btnLoad($('gbtn'),false); 
+      try {
+        await signInWithRedirect(auth, p);
+      } catch(re) {
+        if(err) err.textContent='Login error: '+(re?.message||re);
+      }
+      return; 
+    }
     try{
       await signInWithRedirect(auth,p);
     }catch(re){
@@ -282,7 +285,7 @@ if($('gbtn')) $('gbtn').onclick=async e=>{
   }
 };
 
- if(auth){
+if(auth){
   getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{const err=$('lerr');if(err)err.textContent='Login error: '+e.message});
   onAuthStateChanged(auth,async u=>{
     clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();booted=false;
@@ -299,7 +302,7 @@ if($('gbtn')) $('gbtn').onclick=async e=>{
   });
 }
 
-if($('ubtn')) $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');if(err)err.textContent='';
+ if($('ubtn')) $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');if(err)err.textContent='';
  if(!/^[a-z0-9_]{3,20}$/.test(n)){if(err)err.textContent='Use 3–20 letters, numbers or _';return}
  btnLoad($('ubtn'),true,'Setting up');
  try{await initKeys(me.uid);
@@ -474,8 +477,9 @@ let typeTO,typOn=false;
 if($('msg')){
   $('msg').oninput=()=>{if(!cur||cur.isGroup)return;const id=cur.id;if(!typOn){typOn=true;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:true}).catch(()=>{})}clearTimeout(typeTO);typeTO=setTimeout(()=>{typOn=false;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:false}).catch(()=>{})},1800)};
   $('msg').onkeydown=e=>{if(e.key==='Enter'&&S.enter)send()};
- }
- async function sendFile(f){if(!f||!cur)return;if(f.size>25e6)return toast('Max file size is 25MB');const c=cur,type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':f.type.startsWith('audio/')?'audio':'file';let blob=f;
+}
+
+async function sendFile(f){if(!f||!cur)return;if(f.size>25e6)return toast('Max file size is 25MB');const c=cur,type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':f.type.startsWith('audio/')?'audio':'file';let blob=f;
  if(type==='image'&&f.type!=='image/gif'){try{blob=await(await scaled(f,1600,.82)).blob()}catch{}}
  const task=uploadBytesResumable(ref(storage,`chats/${c.id}/${me.uid}_${Date.now()}`),blob);$('prog').classList.remove('h');
  task.on('state_changed',s=>$('bar').style.width=Math.round(s.bytesTransferred/s.totalBytes*100)+'%',()=>{$('prog').classList.add('h');toast('Upload failed')},async()=>{$('prog').classList.add('h');$('bar').style.width='0';await post(c,type,await getDownloadURL(task.snapshot.ref),{n:f.name,s:f.size},type==='image'?'📷 Photo':type==='video'?'🎬 Video':type==='audio'?'🎙️ Voice Note':'📄 File')})}
@@ -493,8 +497,7 @@ if($('audbtn')) $('audbtn').onclick=async()=>{$('amenu').classList.add('h');
   mediaRecorder.onstop=async()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});audioChunks=[];sendFile(new File([blob],'voice_note.webm',{type:'audio/webm'}))};
  }catch{return toast('Microphone access denied')}}
  if(mediaRecorder.state==='recording'){mediaRecorder.stop();toast('Voice note sent')}else{audioChunks=[];mediaRecorder.start();toast('Recording voice note... Tap again to stop.')}};
-
-'😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};if($('emenu'))$('emenu').appendChild(b)});
+ '😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};if($('emenu'))$('emenu').appendChild(b)});
 if($('ebtn')) $('ebtn').onclick=()=>{$('amenu').classList.add('h');$('emenu').classList.toggle('h')};
 if($('back')) $('back').onclick=closeChat;
 function closeChat(){unsubs.forEach(f=>f());unsubs=[];cur=null;$('chat').classList.add('h');$('emp').classList.remove('h');$('app').classList.remove('open');$('emenu').classList.add('h');$('amenu').classList.add('h')}
