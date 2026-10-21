@@ -505,4 +505,4 @@ async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getD
  const loginEl=$('login');
  if(loginEl){loginEl.addEventListener('pointermove',e=>{mx=e.clientX/W-.5;my=e.clientY/H-.5;if(S.fx3d&&innerWidth>720)$('card').style.transform=`rotateY(${mx*14}deg) rotateX(${-my*12}deg)`})}
  (function f(){!loginEl||loginEl.classList.contains('h')||document.hidden||(x.clearRect(0,0,W,H),x.fillStyle=accol,P.forEach(p=>{S.fx3d&&(p.z-=.0035),p.z<=.02&&(p.z=1,p.x=Math.random()*2-1,p.y=Math.random()*2-1);const k=.45/p.z,sx=W/2+(p.x-mx*.3)*W*k*.5,sy=H/2+(p.y-my*.3)*H*k*.5;x.globalAlpha=Math.min(1,(1-p.z)*1.2),x.beginPath(),x.arc(sx,sy,(1-p.z)*2.6+.4,0,6.3),x.fill()}),x.globalAlpha=1),requestAnimationFrame(f)})()})();
-</script></body></html>
+</script></body></html>                                               
