@@ -181,11 +181,11 @@ setTimeout(function(){
 <input id="fmedia" type="file" accept="image/*,video/*" class="h"><input id="fdoc" type="file" class="h"><input id="favatar" type="file" accept="image/*" class="h"><input id="fbg" type="file" accept="image/*" class="h">
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {GoogleAuthProvider,signInWithRedirect,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut,getAuth,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {getStorage,ref,uploadBytesResumable,getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
+import {initializeApp} from "https://esm.sh/firebase@10.12.2/app";
+import {GoogleAuthProvider,signInWithRedirect,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut,getAuth,setPersistence,browserLocalPersistence} from "https://esm.sh/firebase@10.12.2/auth";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs} from "https://esm.sh/firebase@10.12.2/firestore";
+import {getStorage,ref,uploadBytesResumable,getDownloadURL} from "https://esm.sh/firebase@10.12.2/storage";
+  
 const firebaseConfig={apiKey:"AIzaSyC8_li0jyr4R1Ov5KLZmv5lzsx7VoevYW4",authDomain:"chatly-eb71a.firebaseapp.com",projectId:"chatly-eb71a",storageBucket:"chatly-eb71a.firebasestorage.app",messagingSenderId:"750656487876",appId:"1:750656487876:web:c3b703c5bdada4b0496491"};
 const ADMIN_EMAIL="arbaab9089@gmail.com";
 const SUP_EMAIL="sheikharbaab419@gmail.com";
