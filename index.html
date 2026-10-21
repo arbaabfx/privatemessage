@@ -126,8 +126,8 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
 <div id="login" class="h"><canvas id="fx"></canvas>
  <div id="card">
   <div class="lp"><h2>Sign in</h2><div class="tg">Private messenger. Fast, encrypted, ad-free.</div>
-   <label class="tc"><input type="checkbox" id="terms"><i></i><span>I agree to the <u id="tlink">Terms &amp; Conditions</u></span></label>
-   <button id="gbtn" class="pr gb" disabled><svg viewBox="0 0 48 48" style="stroke:none;width:20px;height:20px"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 010-9.4l-7.9-6.1a24 24 0 000 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg><span id="gtx">Continue with Google</span></button>
+   <label class="tc"><input type="checkbox" id="terms" checked><i></i><span>I agree to the <u id="tlink">Terms &amp; Conditions</u></span></label>
+   <button id="gbtn" class="pr gb"><svg viewBox="0 0 48 48" style="stroke:none;width:20px;height:20px"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 010-9.4l-7.9-6.1a24 24 0 000 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg><span id="gtx">Continue with Google</span></button>
    <p id="lerr"></p></div>
   <div class="rpw"><div class="rp"><span class="fb" style="right:9%;top:12%">Hey, are you there?</span><span class="fb" style="right:24%;top:26%;animation-delay:-1.5s">Photos, files, groups</span><div class="rt"><h3>Welcome back!</h3><p>Your chats are encrypted and waiting for you.</p></div></div></div>
  </div></div>
@@ -141,7 +141,7 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
  <aside id="side">
   <div class="hd"><img id="myimg" class="av" alt=""><div class="nm"><b id="myname"></b><small><i class="on-d"></i>Online</small></div>
    <button id="grpbtn" class="ib" title="New group" data-i="users"></button><button id="setbtn" class="ib" title="Settings" data-i="sliders"></button></div>
-  <div style="padding:12px 12px 4px"><input id="search" class="inp" placeholder="Search username" autocomplete="off"><div id="results"></div>
+  <div style="padding:12px 12px 4px"><input id="search" class=""inp" placeholder="Search username" autocomplete="off"><div id="results"></div>
    <button id="arcview" class="row" style="padding:8px 12px;color:var(--mu);font-size:13px"><span data-i="archive"></span><span id="arcview-txt">Show archived chats</span></button></div>
   <div id="chats"></div>
  </aside>
@@ -183,15 +183,15 @@ try {
   console.error("Firebase init error:", e);
 }
 
-const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('h',x!==id));
+const show=id=>['login','setup','app'].forEach(x=>$(x)?.classList.toggle('h',x!==id));
 const hideSplash=()=>{const s=$('splash');if(s){s.classList.add('x');setTimeout(()=>s.remove(),500)}};
 
 setTimeout(()=>{
   hideSplash();
-  if($('login').classList.contains('h') && $('app').classList.contains('h') &&$('setup').classList.contains('h')){
+  if($('login')?.classList.contains('h') && $('app')?.classList.contains('h') &&$('setup')?.classList.contains('h')){
     show('login');
   }
-}, 2500);
+}, 2000);
 
 const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
 const ic=n=>`<svg viewBox="0 0 24 24">${I[n]||''}</svg>`;
@@ -254,28 +254,18 @@ async function getUser(uid){
   }catch{ userCache.set(uid, null); return null; }
 }
 
-if($('terms')) $('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};
-if($('tlink')) $('tlink').onclick=e=>{e.preventDefault();modal(`<h3 style="margin-bottom:10px">Terms &amp; Conditions</h3><p style="font-size:13px;color:var(--mu)"><b>Usage:</b> Use abchat responsibly.<br><br><b>Privacy:</b> Encrypted chats.</p><button id="tok" class="pr" style="margin-top:16px">I agree</button>`);$('tok').onclick=()=>{$('terms').checked=true;$('gbtn').disabled=false;closeModal()}};
+if($('terms')) $('terms').onchange=()=>{if($('gbtn')) $('gbtn').disabled=!$('terms').checked};
+if($('tlink')) $('tlink').onclick=e=>{e.preventDefault();modal(`<h3 style="margin-bottom:10px">Terms &amp; Conditions</h3><p style="font-size:13px;color:var(--mu)"><b>Usage:</b> Use abchat responsibly.<br><br><b>Privacy:</b> Encrypted chats.</p><button id="tok" class="pr" style="margin-top:16px">I agree</button>`);$('tok').onclick=()=>{$('terms').checked=true;if($('gbtn'))$('gbtn').disabled=false;closeModal()}};
 
 if($('gbtn')) $('gbtn').onclick=async e=>{
   e.preventDefault();
-  if(!$('terms').checked) return toast('Please accept the Terms first');
+  if($('terms') && !$('terms').checked) return toast('Please accept the Terms first');
   const err=$('lerr'); if(err) err.textContent='';
   btnLoad($('gbtn'),true,'Opening Google');
   const p=new GoogleAuthProvider();
   try{
     await signInWithPopup(auth,p);
   }catch(pe){
-    const c=pe?.code||'';
-    if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'||c==='auth/popup-blocked'){ 
-      btnLoad($('gbtn'),false); 
-      try {
-        await signInWithRedirect(auth, p);
-      } catch(re) {
-        if(err) err.textContent='Login error: '+(re?.message||re);
-      }
-      return; 
-    }
     try{
       await signInWithRedirect(auth,p);
     }catch(re){
@@ -285,11 +275,11 @@ if($('gbtn')) $('gbtn').onclick=async e=>{
   }
 };
 
-if(auth){
+ if(auth){
   getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{const err=$('lerr');if(err)err.textContent='Login error: '+e.message});
   onAuthStateChanged(auth,async u=>{
     clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();booted=false;
-    if(!u){me=null;show('login');hideSplash();btnLoad($('gbtn'),false);if($('gbtn'))$('gbtn').disabled=!$('terms')?.checked;return}
+    if(!u){me=null;show('login');hideSplash();btnLoad($('gbtn'),false);return}
     me=u;btnLoad($('gbtn'),false);
     try{
       const s=await getDoc(doc(db,'users',u.uid));
@@ -302,7 +292,7 @@ if(auth){
   });
 }
 
- if($('ubtn')) $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');if(err)err.textContent='';
+if($('ubtn')) $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');if(err)err.textContent='';
  if(!/^[a-z0-9_]{3,20}$/.test(n)){if(err)err.textContent='Use 3–20 letters, numbers or _';return}
  btnLoad($('ubtn'),true,'Setting up');
  try{await initKeys(me.uid);
@@ -405,8 +395,8 @@ function openProfileModal(){
       toast('Report sent to support email!');
     };
   }
-}
-if($('pimg')) $('pimg').onclick=openProfileModal;
+ }
+ if($('pimg')) $('pimg').onclick=openProfileModal;
 if($('pinfo-btn')) $('pinfo-btn').onclick=openProfileModal;
 
 async function render(c,docs){const tok=++tokR,items=[];
@@ -497,7 +487,8 @@ if($('audbtn')) $('audbtn').onclick=async()=>{$('amenu').classList.add('h');
   mediaRecorder.onstop=async()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});audioChunks=[];sendFile(new File([blob],'voice_note.webm',{type:'audio/webm'}))};
  }catch{return toast('Microphone access denied')}}
  if(mediaRecorder.state==='recording'){mediaRecorder.stop();toast('Voice note sent')}else{audioChunks=[];mediaRecorder.start();toast('Recording voice note... Tap again to stop.')}};
- '😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};if($('emenu'))$('emenu').appendChild(b)});
+
+'😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};if($('emenu'))$('emenu').appendChild(b)});
 if($('ebtn')) $('ebtn').onclick=()=>{$('amenu').classList.add('h');$('emenu').classList.toggle('h')};
 if($('back')) $('back').onclick=closeChat;
 function closeChat(){unsubs.forEach(f=>f());unsubs=[];cur=null;$('chat').classList.add('h');$('emp').classList.remove('h');$('app').classList.remove('open');$('emenu').classList.add('h');$('amenu').classList.add('h')}
