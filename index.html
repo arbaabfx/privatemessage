@@ -162,22 +162,42 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
 <input id="fmedia" type="file" accept="image/*,video/*" class="h"><input id="fdoc" type="file" class="h"><input id="favatar" type="file" accept="image/*" class="h"><input id="fbg" type="file" accept="image/*" class="h">
 
 <script type="module">
-import {initializeApp} from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app.js";
-import {GoogleAuthProvider,signInWithRedirect,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut,getAuth,setPersistence,browserLocalPersistence} from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs} from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore.js";
-import {getStorage,ref,uploadBytesResumable,getDownloadURL} from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-storage.js";
+import { initializeApp } from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app.js";
+import { GoogleAuthProvider, signInWithRedirect, signInWithPopup, getRedirectResult, onAuthStateChanged, signOut, getAuth, setPersistence, browserLocalPersistence } from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, onSnapshot, addDoc, runTransaction, serverTimestamp, getDocs } from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-storage.js";
 
 const firebaseConfig={apiKey:"AIzaSyC8_li0jyr4R1Ov5KLZmv5lzsx7VoevYW4",authDomain:"chatly-eb71a.firebaseapp.com",projectId:"chatly-eb71a",storageBucket:"chatly-eb71a.firebasestorage.app",messagingSenderId:"750656487876",appId:"1:750656487876:web:c3b703c5bdada4b0496491"};
 const ADMIN_EMAIL="arbaab9089@gmail.com";
 const SUP_EMAIL="sheikharbaab419@gmail.com";
 const $=i=>document.getElementById(i);
-const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
+
+let app, auth, db, storage;
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+  setPersistence(auth, browserLocalPersistence).catch(()=>{});
+} catch(e) {
+  console.error("Firebase init error:", e);
+}
+
+const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('h',x!==id));
+const hideSplash=()=>{const s=$('splash');if(s){s.classList.add('x');setTimeout(()=>s.remove(),500)}};
+
+setTimeout(()=>{
+  hideSplash();
+  if(!me) show('login');
+}, 1000);
+
+const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
 const ic=n=>`<svg viewBox="0 0 24 24">${I[n]||''}</svg>`;
 const icons=r=>(r||document).querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));icons();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=s=>s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
 let tt;const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3200)};
-const show=id=>['login','setup','app'].forEach(x=>$(x).classList.toggle('h',x!==id));
+
 const modal=h=>{$('modal').innerHTML=`<div class="mc">${h}</div>`;$('modal').classList.remove('h')};
 const closeModal=()=>$('modal').classList.add('h');$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 const btnLoad=(b,on,t)=>{if(on){b.dataset.o=b.innerHTML;b.disabled=true;b.innerHTML='<span class="spin"></span>'+(t||'Please wait')}else{b.disabled=false;if(b.dataset.o)b.innerHTML=b.dataset.o}};
@@ -199,30 +219,6 @@ const avatar=u=>u?.photoURL||'data:image/svg+xml,'+encodeURIComponent(`<svg xmln
 const nm=u=>u?.name||u?.username||'User';
 const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDateString()===t.toDateString()?'Today':d.toDateString()===y.toDateString()?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
 const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
-
-let app,auth,db,storage;
-try{
-  app=initializeApp(firebaseConfig);
-  auth=getAuth(app);
-  db=getFirestore(app);
-  storage=getStorage(app);
-  setPersistence(auth,browserLocalPersistence).catch(()=>{});
-}catch(e){
-  console.error('Firebase init error:', e);
-}
-
-const hideSplash=()=>{
-  const s=$('splash');
-  if(s){
-    s.classList.add('x');
-    setTimeout(()=>s.remove(), 600);
-  }
-};
-
-setTimeout(()=>{
-  hideSplash();
-  if(!me) show('login');
-}, 1500);
 
 const loadImg=f=>new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=URL.createObjectURL(f)});
 async function scaled(f,max,q,sq){const i=await loadImg(f),c=document.createElement('canvas');if(sq){const s=Math.min(i.width,i.height);c.width=c.height=max;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}else{const k=Math.min(1,max/Math.max(i.width,i.height));c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height)}return{url:c.toDataURL('image/jpeg',q),blob:()=>new Promise(r=>c.toBlob(r,'image/jpeg',q))}}
@@ -257,14 +253,30 @@ async function getUser(uid){
   }catch{ userCache.set(uid, null); return null; }
 }
 
- $('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};
+$('terms').onchange=()=>{$('gbtn').disabled=!$('terms').checked};
 $('tlink').onclick=e=>{e.preventDefault();modal(`<h3 style="margin-bottom:10px">Terms &amp; Conditions</h3><p style="font-size:13px;color:var(--mu)"><b>Usage:</b> Use abchat responsibly.<br><br><b>Privacy:</b> Encrypted chats.</p><button id="tok" class="pr" style="margin-top:16px">I agree</button>`);$('tok').onclick=()=>{$('terms').checked=true;$('gbtn').disabled=false;closeModal()}};
-$('gbtn').onclick=async e=>{e.preventDefault();if(!$('terms').checked)return toast('Please accept the Terms first');
- const err=$('lerr');err.textContent='';btnLoad($('gbtn'),true,'Opening Google');const p=new GoogleAuthProvider();
- try{await signInWithPopup(auth,p)}catch(pe){const c=pe?.code||'';
-  if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'){btnLoad($('gbtn'),false);return}
-  try{await signInWithRedirect(auth,p)}catch(re){err.textContent='Login error: '+(re?.message||re);btnLoad($('gbtn'),false)}}};
-if(auth){
+
+$('gbtn').onclick=async e=>{
+  e.preventDefault();
+  if(!$('terms').checked) return toast('Please accept the Terms first');
+  const err=$('lerr'); err.textContent='';
+  btnLoad($('gbtn'),true,'Opening Google');
+  const p=new GoogleAuthProvider();
+  try{
+    await signInWithPopup(auth,p);
+  }catch(pe){
+    const c=pe?.code||'';
+    if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'){ btnLoad($('gbtn'),false); return; }
+    try{
+      await signInWithRedirect(auth,p);
+    }catch(re){
+      err.textContent='Login error: '+(re?.message||re);
+      btnLoad($('gbtn'),false);
+    }
+  }
+};
+
+ if(auth){
   getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{$('lerr').textContent='Login error: '+e.message});
   onAuthStateChanged(auth,async u=>{
     clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();booted=false;
@@ -369,7 +381,6 @@ async function openChat(peerArg){
  unsubs.push(onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts','desc'),limit(150)),s=>render(c,s.docs.slice().reverse())));
  if(innerWidth>767)$('msg').focus()}
 
-// Profile view & reporting modal
 function openProfileModal(){
   if(!cur)return;
   if(cur.isGroup){
@@ -450,7 +461,8 @@ async function post(c,type,url,meta,pv,gct){
 async function send(){const t=$('msg').value.trim();if(!t||!cur)return;const r=cur.reply?{...cur.reply}:null;$('msg').value='';clearReply();beep(620);
  try{await post(cur,'text',null,r?{t,r}:{t},t.slice(0,60),r?'\u0001'+JSON.stringify(r)+'\u0002'+t:t)}catch{toast('Send failed')}}
 $('send').onclick=send;
- let typeTO,typOn=false;
+
+let typeTO,typOn=false;
 $('msg').oninput=()=>{if(!cur||cur.isGroup)return;const id=cur.id;if(!typOn){typOn=true;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:true}).catch(()=>{})}clearTimeout(typeTO);typeTO=setTimeout(()=>{typOn=false;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:false}).catch(()=>{})},1800)};
 $('msg').onkeydown=e=>{if(e.key==='Enter'&&S.enter)send()};
 
@@ -471,8 +483,7 @@ $('audbtn').onclick=async()=>{$('amenu').classList.add('h');
   mediaRecorder.onstop=async()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});audioChunks=[];sendFile(new File([blob],'voice_note.webm',{type:'audio/webm'}))};
  }catch{return toast('Microphone access denied')}}
  if(mediaRecorder.state==='recording'){mediaRecorder.stop();toast('Voice note sent')}else{audioChunks=[];mediaRecorder.start();toast('Recording voice note... Tap again to stop.')}};
-
-'😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};$('emenu').appendChild(b)});
+ '😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};$('emenu').appendChild(b)});
 $('ebtn').onclick=()=>{$('amenu').classList.add('h');$('emenu').classList.toggle('h')};$('back').onclick=closeChat;
 function closeChat(){unsubs.forEach(f=>f());unsubs=[];cur=null;$('chat').classList.add('h');$('emp').classList.remove('h');$('app').classList.remove('open');$('emenu').classList.add('h');$('amenu').classList.add('h')}
 $('arcbtn').onclick=async()=>{if(!cur)return;const r=doc(db,'chats',cur.id),isA=(await getDoc(r)).data()?.archivedBy?.[me.uid]||false;await updateDoc(r,{[`archivedBy.${me.uid}`]:!isA});toast(isA?'Chat unarchived':'Chat archived');closeChat()};
@@ -516,7 +527,7 @@ $('sp').onclick=async e=>{const t=e.target.closest('.ah,[data-k],[data-th],[data
  if(x==='save'){try{await updateDoc(doc(db,'users',me.uid),{name:$('sname').value.trim(),about:$('sabout').value.trim(),photoURL:profile.photoURL||''});profile.name=$('sname').value.trim();profile.about=$('sabout').value.trim();paintMe();toast('Profile saved')}catch(er){toast('Save failed: '+er.message)}}
  if(x==='inv'){navigator.clipboard?.writeText(location.href.split('#')[0]);toast('Invite link copied')}
  if(x==='adm')adminPanel();
- if(x==='outलेक्ट्रونिक्सவைக்Signout':'out','Sign out');closeSettings();signOut(auth)}};
+ if(x==='out'){closeSettings();signOut(auth)}};
 $('sp').oninput=e=>{if(e.target.id==='sfs'){S.fs=+e.target.value;save();applyS()}};
 $('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL=(await scaled(f,256,.8,true)).url;$('sav').src=profile.photoURL;paintMe();toast('Photo ready. Tap Save profile.')}e.target.value=''};
 $('fbg').onchange=async e=>{const f=e.target.files[0];if(f){S.customBg=(await scaled(f,1280,.7)).url;save();applyS();toast('Background set')}e.target.value=''};
@@ -530,4 +541,4 @@ async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getD
  const loginEl=$('login');
  if(loginEl){loginEl.addEventListener('pointermove',e=>{mx=e.clientX/W-.5;my=e.clientY/H-.5;if(S.fx3d&&innerWidth>720)$('card').style.transform=`rotateY(${mx*14}deg) rotateX(${-my*12}deg)`})}
  (function f(){!loginEl||loginEl.classList.contains('h')||document.hidden||(x.clearRect(0,0,W,H),x.fillStyle=accol,P.forEach(p=>{S.fx3d&&(p.z-=.0035),p.z<=.02&&(p.z=1,p.x=Math.random()*2-1,p.y=Math.random()*2-1);const k=.45/p.z,sx=W/2+(p.x-mx*.3)*W*k*.5,sy=H/2+(p.y-my*.3)*H*k*.5;x.globalAlpha=Math.min(1,(1-p.z)*1.2),x.beginPath(),x.arc(sx,sy,(1-p.z)*2.6+.4,0,6.3),x.fill()}),x.globalAlpha=1),requestAnimationFrame(f)})()})();
-</script></body></html
+</script></body></html>
