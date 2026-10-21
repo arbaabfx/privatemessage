@@ -123,25 +123,6 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;t
 </style></head><body>
 <div id="splash"><div class="lg" data-i="chat"></div><small style="opacity:.6;letter-spacing:1px">Built with Nativine</small></div>
 
-<script>
-// Watchdog: without this, if Firebase fails to load/connect (blocked network,
-// bad config, offline device, etc.) the splash screen stays up forever with
-// no feedback to the user. This runs as a plain (non-module) script, so it
-// still works even if the module script below fails to load entirely.
-window.__abchatReady = false;
-window.addEventListener('error', function(e){ console.error('abchat error:', e.error || e.message); });
-window.addEventListener('unhandledrejection', function(e){ console.error('abchat unhandled rejection:', e.reason); });
-setTimeout(function(){
-  if (window.__abchatReady) return;
-  var splash = document.getElementById('splash');
-  if (!splash) return;
-  splash.innerHTML =
-    '<div class="lg" data-i="chat"></div>' +
-    '<p style="color:#ff5252;font-size:13px;max-width:280px;text-align:center;margin-top:6px;line-height:1.5">Taking longer than usual to connect.<br>Check your internet connection, then try again.</p>' +
-    '<button onclick="location.reload()" style="margin-top:6px;padding:10px 24px;border-radius:999px;border:1px solid #00f2fe;background:transparent;color:#00f2fe;font:inherit;font-weight:600;cursor:pointer">Reload</button>';
-}, 8000);
-</script>
-
 <div id="login" class="h"><canvas id="fx"></canvas>
  <div id="card">
   <div class="lp"><h2>Sign in</h2><div class="tg">Private messenger. Fast, encrypted, ad-free.</div>
@@ -185,7 +166,7 @@ import {initializeApp} from "https://esm.sh/firebase@10.12.2/app";
 import {GoogleAuthProvider,signInWithRedirect,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut,getAuth,setPersistence,browserLocalPersistence} from "https://esm.sh/firebase@10.12.2/auth";
 import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs} from "https://esm.sh/firebase@10.12.2/firestore";
 import {getStorage,ref,uploadBytesResumable,getDownloadURL} from "https://esm.sh/firebase@10.12.2/storage";
-  
+
 const firebaseConfig={apiKey:"AIzaSyC8_li0jyr4R1Ov5KLZmv5lzsx7VoevYW4",authDomain:"chatly-eb71a.firebaseapp.com",projectId:"chatly-eb71a",storageBucket:"chatly-eb71a.firebasestorage.app",messagingSenderId:"750656487876",appId:"1:750656487876:web:c3b703c5bdada4b0496491"};
 const ADMIN_EMAIL="arbaab9089@gmail.com";
 const SUP_EMAIL="sheikharbaab419@gmail.com";
@@ -219,15 +200,31 @@ const nm=u=>u?.name||u?.username||'User';
 const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDateString()===t.toDateString()?'Today':d.toDateString()===y.toDateString()?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
 const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
 
-let app,auth,db,storage,initError=null;
-try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app);setPersistence(auth,browserLocalPersistence).catch(()=>{})}catch(e){console.error(e);initError=e}
-if(initError||!auth){
-  window.__abchatReady=true;
-  const s=document.getElementById('splash');if(s)s.remove();
-  show('login');
-  const err=document.getElementById('lerr');
-  if(err)err.textContent='Could not connect: '+(initError?.message||'Firebase failed to initialize. Check your internet connection and reload.');
+let app,auth,db,storage;
+try{
+  app=initializeApp(firebaseConfig);
+  auth=getAuth(app);
+  db=getFirestore(app);
+  storage=getStorage(app);
+  setPersistence(auth,browserLocalPersistence).catch(()=>{});
+}catch(e){
+  console.error('Firebase init error:', e);
 }
+
+const hideSplash=()=>{
+  const s=$('splash');
+  if(s){
+    s.classList.add('x');
+    setTimeout(()=>s.remove(), 600);
+  }
+};
+
+// Fail-safe: Always hide splash after 1.5 seconds no matter what
+setTimeout(()=>{
+  hideSplash();
+  if(!me) show('login');
+}, 1500);
+
 const loadImg=f=>new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=URL.createObjectURL(f)});
 async function scaled(f,max,q,sq){const i=await loadImg(f),c=document.createElement('canvas');if(sq){const s=Math.min(i.width,i.height);c.width=c.height=max;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}else{const k=Math.min(1,max/Math.max(i.width,i.height));c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height)}return{url:c.toDataURL('image/jpeg',q),blob:()=>new Promise(r=>c.toBlob(r,'image/jpeg',q))}}
 
@@ -268,18 +265,22 @@ $('gbtn').onclick=async e=>{e.preventDefault();if(!$('terms').checked)return toa
  try{await signInWithPopup(auth,p)}catch(pe){const c=pe?.code||'';
   if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'){btnLoad($('gbtn'),false);return}
   try{await signInWithRedirect(auth,p)}catch(re){err.textContent='Login error: '+(re?.message||re);btnLoad($('gbtn'),false)}}};
-getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{$('lerr').textContent='Login error: '+e.message});
-
-const hideSplash=()=>{window.__abchatReady=true;const s=$('splash');if(s){s.classList.add('x');setTimeout(()=>s.remove(),600)}};
-
-if(auth)onAuthStateChanged(auth,async u=>{clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();booted=false;
- if(!u){me=null;show('login');hideSplash();btnLoad($('gbtn'),false);$('gbtn').disabled=!$('terms').checked;return}
- me=u;btnLoad($('gbtn'),false);
- try{const s=await getDoc(doc(db,'users',u.uid));if(!s.exists()){show('setup');hideSplash();return}
-  profile={uid:u.uid,...s.data()};userCache.set(u.uid,profile);
-  if(profile.disabled){alert('Your account has been disabled by admin.');signOut(auth);return}
-  try{await boot()}catch(be){console.error(be);show('app');toast('Connected in limited mode')}}
- catch(e){show('app');toast('Database error: '+e.message)}hideSplash()});
+if(auth){
+  getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{$('lerr').textContent='Login error: '+e.message});
+  onAuthStateChanged(auth,async u=>{
+    clearInterval(presence);chatsUnsub?.();closeChat();closeModal();userCache.clear();booted=false;
+    if(!u){me=null;show('login');hideSplash();btnLoad($('gbtn'),false);$('gbtn').disabled=!$('terms').checked;return}
+    me=u;btnLoad($('gbtn'),false);
+    try{
+      const s=await getDoc(doc(db,'users',u.uid));
+      if(!s.exists()){show('setup');hideSplash();return}
+      profile={uid:u.uid,...s.data()};userCache.set(u.uid,profile);
+      if(profile.disabled){alert('Your account has been disabled by admin.');signOut(auth);return}
+      try{await boot()}catch(be){console.error(be);show('app');toast('Connected in limited mode')}
+    }catch(e){show('app');toast('Database error: '+e.message)}
+    hideSplash();
+  });
+}
 
 $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');err.textContent='';
  if(!/^[a-z0-9_]{3,20}$/.test(n)){err.textContent='Use 3–20 letters, numbers or _';return}
@@ -352,8 +353,8 @@ async function openChat(peerArg){
      await setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true});
    }catch(e){ return toast('Could not open chat: '+e.message); }
  }
- 
- const chatDocSnap = await getDoc(doc(db,'chats',id));
+
+  const chatDocSnap = await getDoc(doc(db,'chats',id));
  const chatData = chatDocSnap.exists() ? chatDocSnap.data() : {};
  const customBg = chatData?.customBg || '';
  const disappear = chatData?.disappear || 0;
@@ -380,7 +381,7 @@ function openProfileModal(){
     $('m-block').onclick=()=>{closeModal();closeChat();toast('User blocked successfully')};
     $('m-report').onclick=()=>{
       closeModal();
-      const rUrl=`mailto:${SUP_EMAIL}?subject=Abchat%20User%20Report&body=Reporting%20User:%20${p.username}%20(UID:%20${p.uid})%0AReporter:%20${me.email}%0AReason:%20Violation%20of%20Terms`;
+      const rUrl=`mailto:${SUP_EMAIL}?subject=Abchat\%20User\%20Report&body=Reporting\%20User:\%20${p.username}%20(UID:%20${p.uid})\%0AReporter:\%20${me.email}%0AReason:%20Violation%20of%20Terms`;
       location.href=rUrl;
       toast('Report sent to support email!');
     };
@@ -404,15 +405,15 @@ async function render(c,docs){const tok=++tokR,items=[];
    if(m.type==='image')body=`<img src="${esc(m.url)}" data-img="${esc(m.url)}" loading="lazy">`;
    else if(m.type==='video')body=`<video controls preload="metadata" src="${esc(m.url)}"></video>`;
    else if(m.type==='audio')body=`<audio controls preload="metadata" src="${esc(m.url)}"></audio>`;
-   else if(m.type==='file')body=`<a class="fl" href="${esc(m.url)}" target="_blank" rel="noopener">${ic('file')}<span style="min-width:0"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis">${esc(x.n||'Document')}</b><small>${fsize(x.s||0)}</small></span></a>`;
+   else if(m.type==='file')body=`<a class="fl" href="${esc(m.url)}" target="_blank" rel="noopener">${ic('file')}<span style="min-width:0"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis">${esc(x.n\vert{}\vert{}'Document')}</b><small>${fsize(x.s||0)}</small></span></a>`;
    else body=(x.r?`<div class="q"><b>${esc(x.r.n)}</b>${esc(x.r.t)}</div>`:'')+link(esc(x.t));
 
    const reactions=m.reactions||{};
-   const reactHtml=Object.entries(reactions).map(([emoji,uids])=>`<span class="react-badge">${emoji} ${uids.length}</span>`).join('');
+   const reactHtml=Object.entries(reactions).map(([emoji,uids])=>`<span class="react-badge">${emoji}${uids.length}</span>`).join('');
 
    const fresh=c.init,cls=!fresh?(i>=items.length-10?'ent':''):mine?'f3r':'f3l';if(fresh&&!mine)inc=true;
    el=document.createElement('div');el.className='mw';el.dataset.id=id;
-   el.innerHTML=`${dl!==day?`<div class="dp">${dl}</div>`:''}<div class="mr ${mine?'me':''} ${cls}"><div class="bub">${body}<div class="reactions">${reactHtml}</div><div class="tm">${tm}</div><div class="act"><button data-a="r">${ic('reply')}</button><button data-a="react">👍</button>${m.type==='text'||!m.type?`<button data-a="c">${ic('copy')}</button>`:''}${mine?`<button data-a="d">${ic('trash')}</button>`:''}</div></div></div>`;
+   el.innerHTML=`${dl!==day?`<div class="dp">${dl}</div>`:''}<div class="mr ${mine?'me':''}${cls}"><div class="bub">${body}<div class="reactions">${reactHtml}</div><div class="tm">${tm}</div><div class="act"><button data-a="r">${ic('reply')}</button><button data-a="react">👍</button>${m.type==='text'||!m.type?`<button data-a="c">${ic('copy')}</button>`:''}${mine?`<button data-a="d">${ic('trash')}</button>`:''}</div></div></div>`;
    if(!fresh)el.style.animationDelay=(i-Math.max(0,items.length-10))*35+'ms';
    c.els.set(id,el);c.txt.set(id,{n:mine?'You':(c.isGroup?'Member':nm(c.peer)),t:m.type==='image'?'Photo':m.type==='video'?'Video':m.type==='audio'?'Voice Note':m.type==='file'?(x.n||'File'):x.t.slice(0,90),raw:x.t})}
   else{const t=el.querySelector('.tm');if(t&&t.textContent!==tm)t.textContent=tm}
@@ -424,7 +425,7 @@ $('msgs').onscroll=e=>{const b=e.target;$('dn').classList.toggle('h',b.scrollHei
 $('msgs').onclick=async e=>{const a=e.target.closest('[data-a]'),im=e.target.dataset.img;
  if(im)return modal(`<img src="${esc(im)}" style="max-width:100%;max-height:80vh;border-radius:14px;display:block;margin:auto">`);
  if(a&&cur){const id=a.closest('.mw').dataset.id,t=cur.txt.get(id),k=a.dataset.a;
-  if(k==='r'){cur.reply={n:t.n,t:t.t};$('rbt').innerHTML=`<b>${esc(t.n)}</b> ${esc(t.t)}`;$('rb').classList.remove('h');$('msg').focus()}
+  if(k==='r'){cur.reply={n:t.n,t:t.t};$('rbt').innerHTML=`<b>${esc(t.n)}</b>${esc(t.t)}`;$('rb').classList.remove('h');$('msg').focus()}
   if(k==='c'){navigator.clipboard?.writeText(t.raw);toast('Copied')}
   if(k==='react'){
     modal(`<h3 style="margin-bottom:12px">React to message</h3><div style="display:flex;gap:12px;font-size:24px;justify-content:center"><button class="emo" data-e="👍">👍</button><button class="emo" data-e="❤️">❤️</button><button class="emo" data-e="🔥">🔥</button><button class="emo" data-e="🚀">🚀</button><button class="emo" data-e="💀">💀</button></div>`);
@@ -493,18 +494,16 @@ const swr=(k,t,s)=>`<div class="st"><div><b>${t}</b><small>${s}</small></div><bu
 const sec=(i,ico,t,s,b)=>`<section class="acc" style="--d:${80+i*70}ms"><button class="ah" type="button"><span class="ci">${ic(ico)}</span><span>${t}<small>${s}</small></span><span class="ch">${ic('down')}</span></button><div class="bd"><div><div class="bi">${b}</div></div></div></section>`;
 function openSettings(){const sp=$('sp');
  sp.innerHTML=`<div class="wrap"><div class="sbar"><button class="ib" data-x="back">${ic('back')}</button><h2>Settings</h2></div>
- <div class="pc"><img id="sav" class="av" src="${esc(avatar(profile))}"><div><b>${esc(nm(profile))}</b><small>@${esc(profile.username||'')}</small></div></div>
- ${sec(0,'user','Profile','Name, photo and about',`<div style="text-align:center"><button class="tb" data-x="photo" style="flex:none;padding:8px 18px">Change photo</button></div><input id="sname" class="inp" placeholder="Name" value="${esc(profile.name||'')}"><input id="sabout" class="inp" placeholder="About" value="${esc(profile.about||'')}"><button class="pr" data-x="save">Save profile</button>`)}
+ <div class="pc"><img id="sav" class="av" src="${esc(avatar(profile))}"><div><b>${esc(nm(profile))}</b><small>@${esc(profile.username\vert{}\vert{}'')}</small></div></div>${sec(0,'user','Profile','Name, photo and about',`<div style="text-align:center"><button class="tb" data-x="photo" style="flex:none;padding:8px 18px">Change photo</button></div><input id="sname" class="inp" placeholder="Name" value="${esc(profile.name||'')}"><input id="sabout" class="inp" placeholder="About" value="${esc(profile.about||'')}"><button class="pr" data-x="save">Save profile</button>`)}
  ${sec(1,'palette','Appearance','Theme, colour, text size, 3D',`<small style="margin-bottom:8px">Theme</small><div class="opts">${[['neon','Neon dark'],['light','Light'],['amoled','Black']].map(([k,n])=>`<button class="tb ${S.theme===k?'on':''}" data-th="${k}">${n}</button>`).join('')}</div>
-  <small style="margin:14px 0 8px">Accent colour</small><div class="opts">${Object.keys(ACS).map(k=>`<button class="dot ${S.ac===k?'on':''}" data-ac="${k}" style="background:${ACS[k][0]}"></button>`).join('')}</div>
+  <small style="margin:14px 0 8px">Accent colour</small><div class="opts">${Object.keys(ACS).map(k=>`<button class="dot ${S.ac===k?'on':''}" data-ac="${k}" style="background:${ACS[k][0]}"></button></div>
   <small style="margin:14px 0 4px">Text size</small><input type="range" id="sfs" min="13" max="19" value="${S.fs}">${swr('fx3d','3D effects','Turn off if your phone feels slow')}
   <div class="st"><div><b>Chat background</b><small>Use your own photo</small></div><div class="opts"><button class="tb" data-x="bg" style="margin:0;min-width:0;padding:8px 14px">Upload</button>${S.customBg?'<button class="tb" data-x="bgx" style="margin:0;min-width:0;padding:8px 14px">Reset</button>':''}</div></div>`)}
  ${sec(2,'bell','Notifications','Sounds and alerts',swr('sound','Message sound','Beep on send and receive')+swr('pop','3D message pop-up','Card shows when another chat messages you')+swr('desk','Desktop alerts','When this tab is in the background'))}
  ${sec(3,'chat','Chat','Typing behaviour',swr('enter','Enter to send','Off = use the send button'))}
  ${sec(4,'shield','Account','Support and sign out',`<a class="tb" href="mailto:${SUP_EMAIL}" style="display:block;text-align:center;text-decoration:none;padding:12px;border-radius:14px;border:1px solid var(--bd);background:var(--pn2);margin-bottom:10px">Contact Support (${SUP_EMAIL})</a><button class="tb" data-x="inv" style="width:100%;margin-bottom:8px">Copy invite link</button>${me.email===ADMIN_EMAIL?'<button class="tb" data-x="adm" style="width:100%;margin-bottom:8px">Admin dashboard</button>':''}<button class="tb dg" data-x="out" style="width:100%">Sign out</button>`)}</div>`;
  requestAnimationFrame(()=>sp.classList.add('on'))}
-const closeSettings=()=>$('sp').classList.remove('on');
-$('sp').onclick=async e=>{const t=e.target.closest('.ah,[data-k],[data-th],[data-ac],[data-x]');if(!t)return;
+const closeSettings=()=>$('sp').classList.remove('on');$('sp').onclick=async e=>{const t=e.target.closest('.ah,[data-k],[data-th],[data-ac],[data-x]');if(!t)return;
  if(t.classList.contains('ah')){const a=t.parentElement,o=a.classList.contains('o');$('sp').querySelectorAll('.acc.o').forEach(x=>x.classList.remove('o'));if(!o)a.classList.add('o');return}
  if(t.dataset.k){const k=t.dataset.k;S[k]=S[k]?0:1;if(k==='desk'&&S.desk&&window.Notification&&Notification.permission!=='granted')Notification.requestPermission().then(p=>{if(p!=='granted'){S.desk=0;t.classList.remove('on');save()}});t.classList.toggle('on',!!S[k]);save();applyS();return}
  if(t.dataset.th){S.theme=t.dataset.th;t.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b===t));save();applyS();return}
@@ -518,8 +517,7 @@ $('sp').onclick=async e=>{const t=e.target.closest('.ah,[data-k],[data-th],[data
  if(x==='inv'){navigator.clipboard?.writeText(location.href.split('#')[0]);toast('Invite link copied')}
  if(x==='adm')adminPanel();
  if(x==='out'){closeSettings();signOut(auth)}};
-$('sp').oninput=e=>{if(e.target.id==='sfs'){S.fs=+e.target.value;save();applyS()}};
-$('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL=(await scaled(f,256,.8,true)).url;$('sav').src=profile.photoURL;paintMe();toast('Photo ready. Tap Save profile.')}e.target.value=''};
+$('sp').oninput=e=>{if(e.target.id==='sfs'){S.fs=+e.target.value;save();applyS()}};$('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL=(await scaled(f,256,.8,true)).url;$('sav').src=profile.photoURL;paintMe();toast('Photo ready. Tap Save profile.')}e.target.value=''};
 $('fbg').onchange=async e=>{const f=e.target.files[0];if(f){S.customBg=(await scaled(f,1280,.7)).url;save();applyS();toast('Background set')}e.target.value=''};
 
 async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getDocs(collection(db,'users'));
@@ -531,4 +529,4 @@ async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getD
  const loginEl=$('login');
  if(loginEl){loginEl.addEventListener('pointermove',e=>{mx=e.clientX/W-.5;my=e.clientY/H-.5;if(S.fx3d&&innerWidth>720)$('card').style.transform=`rotateY(${mx*14}deg) rotateX(${-my*12}deg)`})}
  (function f(){!loginEl||loginEl.classList.contains('h')||document.hidden||(x.clearRect(0,0,W,H),x.fillStyle=accol,P.forEach(p=>{S.fx3d&&(p.z-=.0035),p.z<=.02&&(p.z=1,p.x=Math.random()*2-1,p.y=Math.random()*2-1);const k=.45/p.z,sx=W/2+(p.x-mx*.3)*W*k*.5,sy=H/2+(p.y-my*.3)*H*k*.5;x.globalAlpha=Math.min(1,(1-p.z)*1.2),x.beginPath(),x.arc(sx,sy,(1-p.z)*2.6+.4,0,6.3),x.fill()}),x.globalAlpha=1),requestAnimationFrame(f)})()})();
-</script></body></html>                                               
+</script></body></html>
