@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no,interactive-widget=resizes-content">
+<meta name="theme-color" content="#7a68e8">
+<title>abchat · Secure Messenger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--ac:#00f2fe;--ac2:#4facfe;--fs:15px}
+body{--l1:#051c30;--l2:#01070d;--cardbg:rgba(5,28,48,.88);--rpa:#053055;--rpb:#020b14;--bg:#020b14;--pn:#051422;--pn2:#0a2238;--tx:#f0f9ff;--mu:#8aa8c1;--bd:rgba(0,242,254,.18);--in:#0e2a44;--ink:#01060b;font:var(--fs)/1.5 'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);height:100dvh;overflow:hidden}
+body.soft{--bg:#f7f4ff;--pn:#fff;--pn2:#efeaff;--tx:#241b3d;--mu:#7b7396;--bd:rgba(139,123,255,.28);--in:#fff;--ink:#fff;--l1:#fff;--l2:#e2d9ff;--cardbg:rgba(255,255,255,.93);--rpa:#7a68e8;--rpb:#5b49c9}
+body.light{--bg:#f0f6fc;--pn:#fff;--pn2:#e5eff7;--tx:#091a2a;--mu:#52718a;--bd:rgba(0,120,180,.2);--in:#fff}
+body.amoled{--bg:#000;--pn:#06080a;--pn2:#101418;--in:#141a20}
+button{border:0;background:none;color:inherit;font:inherit;cursor:pointer}input{font:inherit;color:inherit}
+small{color:var(--mu);font-size:12px;display:block}b{font-weight:600}
+svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.h{display:none!important}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:6px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}}
+@keyframes pop{from{opacity:0;transform:perspective(700px) rotateX(-35deg) translateY(18px) scale(.92)}}
+@keyframes rot{to{transform:rotate(360deg)}}
+#splash{position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);transition:opacity .5s}#splash.x{opacity:0;pointer-events:none}
+.lg{width:88px;height:88px;border-radius:28px;border:1.5px solid var(--ac);display:grid;place-items:center;color:var(--ac);box-shadow:0 0 50px -6px var(--ac);animation:pulse 1.6s ease-in-out infinite}.lg svg{width:42px;height:42px}
+@keyframes pulse{50%{transform:perspective(500px) rotateY(180deg) scale(1.08);box-shadow:0 0 80px -4px var(--ac)}}
+.ib{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--pn2);color:var(--mu);border:1px solid transparent;transition:.25s;flex-shrink:0}
+.ib:hover{color:var(--ac);border-color:var(--bd);transform:translateY(-2px);box-shadow:0 8px 18px -8px var(--ac)}.ib:active{transform:scale(.9)}
+.pr{height:46px;border-radius:999px;width:100%;font-weight:600;color:var(--ink);background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 0 24px -6px var(--ac);transition:.25s;position:relative;overflow:hidden}
+.pr:hover{transform:translateY(-2px);box-shadow:0 8px 28px -4px var(--ac)}.pr:active{transform:scale(.97)}.pr:disabled{opacity:.4;transform:none;box-shadow:none;cursor:not-allowed}
+.gb{background:#fff;color:#1f2937;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 0 24px -6px var(--ac)}
+.spin{width:16px;height:16px;border:2.5px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:rot .7s linear infinite;display:inline-block;margin-right:8px;vertical-align:-3px}
+.rip{position:absolute;border-radius:50%;background:rgba(0,0,0,.2);transform:scale(0);animation:rp .55s ease-out;pointer-events:none}@keyframes rp{to{transform:scale(3);opacity:0}}
+.inp{width:100%;height:44px;border-radius:999px;border:1px solid var(--bd);background:var(--pn2);padding:0 16px;outline:0;transition:.25s}
+.inp:focus{border-color:var(--ac);box-shadow:0 0 16px -4px var(--ac)}
+.av{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--ac);flex-shrink:0;background:var(--pn2)}
+
+#login{position:fixed;inset:0;z-index:20;display:grid;place-items:center;perspective:1200px;background:radial-gradient(circle at 50% 40%,var(--l1),var(--l2) 72%);overflow:hidden}
+#fx{position:absolute;inset:0;width:100%;height:100%}
+#card{position:relative;width:min(860px,92vw);height:430px;border:1px solid var(--bd);background:rgba(5,28,48,.75);backdrop-filter:blur(12px);box-shadow:0 0 30px rgba(0,242,254,.15),inset 0 0 40px -20px var(--ac);transform-style:preserve-3d;transition:transform .2s ease-out;animation:cin 1.1s cubic-bezier(.2,.9,.3,1) backwards;color:var(--tx)}
+@keyframes cin{from{opacity:0;transform:rotateX(60deg) translateZ(-320px) translateY(90px)}}
+.lp{position:absolute;left:0;top:0;bottom:0;width:54%;padding:0 42px;display:flex;flex-direction:column;justify-content:center;gap:14px;z-index:2}
+.lp h2{font-size:32px;font-weight:700}.lp .tg{color:var(--mu);font-size:13px}
+.tc{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--mu);cursor:pointer;user-select:none}
+.tc input{display:none}.tc i{width:20px;height:20px;border:1.5px solid var(--ac);border-radius:6px;display:grid;place-items:center;transition:.25s;flex-shrink:0}
+.tc input:checked+i{background:var(--ac);box-shadow:0 0 12px var(--ac)}.tc input:checked+i::after{content:"";width:5px;height:10px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.tc u{color:var(--ac);font-weight:600;cursor:pointer}
+#lerr{color:#ff5252;font-size:12px;min-height:16px}
+.rpw{position:absolute;inset:0;filter:drop-shadow(0 0 2px var(--ac));pointer-events:none}
+.rp{position:absolute;inset:0;clip-path:polygon(33% 0,100% 0,100% 100%,83% 100%);background:linear-gradient(225deg,var(--ac),var(--rpa) 40%,var(--rpb) 95%)}
+.rt{color:#fff;position:absolute;right:6%;top:52%;transform:translateY(-50%);text-align:right;width:34%}
+.rt h3{font-size:clamp(22px,3.6vw,34px);line-height:1.1;font-weight:700;text-transform:uppercase}.rt p{font-size:12px;margin-top:8px;opacity:.9}
+.fb{position:absolute;padding:7px 13px;border-radius:14px 14px 4px 14px;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);font-size:11.5px;color:#fff;animation:fl 4s ease-in-out infinite;white-space:nowrap}
+@keyframes fl{50%{transform:perspective(500px) translate3d(0,-10px,40px) rotateY(-12deg)}}
+@media(max-width:720px){#card{height:auto;display:flex;flex-direction:column}.rpw{position:relative;order:-1;height:190px;inset:auto}.rp{clip-path:polygon(0 0,100% 0,100% 80%,0 100%)}.rt{width:60%;top:46%}.lp{position:relative;width:100%;padding:18px 28px 34px}}
+
+#app{position:fixed;inset:0;display:flex;background:var(--bg);animation:appIn .7s cubic-bezier(.2,.9,.3,1) both}
+@keyframes appIn{from{opacity:0;transform:perspective(1200px) rotateX(6deg) scale(.97)}}
+#side{width:370px;background:var(--pn);border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
+#main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:var(--bg)}
+.hd{height:66px;padding:0 14px;display:flex;align-items:center;gap:12px;background:var(--pn);border-bottom:1px solid var(--bd);flex-shrink:0}
+.hd .nm{min-width:0;flex:1;cursor:pointer}.hd .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.on-d{display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;margin-right:5px;box-shadow:0 0 8px #10b981}
+.row{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;width:100%;text-align:left;transition:.25s;animation:fadeUp .45s both}
+.row:hover{background:var(--pn2);transform:translateX(5px)}.row .nm{min-width:0;flex:1}.row .nm b,.row .nm small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ud{width:10px;height:10px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac)}
+#chats{flex:1;overflow-y:auto;padding:0 8px 8px;min-height:0}
+.empty{text-align:center;color:var(--mu);font-size:13px;padding:30px}
+@media(max-width:767px){#side{width:100%}#main{position:absolute;inset:0;z-index:5;transform:translateX(100%);transition:transform .45s cubic-bezier(.2,.9,.3,1)}#app.open #main{transform:none}}
+#emp{margin:auto;text-align:center;color:var(--mu);padding:20px}
+.cube{width:90px;height:90px;margin:0 auto 50px;transform-style:preserve-3d;animation:cs 14s linear infinite}
+@keyframes cs{to{transform:rotateX(360deg) rotateY(360deg)}}
+.cube i{position:absolute;inset:0;border:1.5px solid var(--ac);background:rgba(0,242,254,.08);box-shadow:inset 0 0 24px -8px var(--ac)}
+.cube i:nth-child(1){transform:translateZ(45px)}.cube i:nth-child(2){transform:rotateY(180deg) translateZ(45px)}.cube i:nth-child(3){transform:rotateY(90deg) translateZ(45px)}.cube i:nth-child(4){transform:rotateY(-90deg) translateZ(45px)}.cube i:nth-child(5){transform:rotateX(90deg) translateZ(45px)}.cube i:nth-child(6){transform:rotateX(-90deg) translateZ(45px)}
+#chat{flex:1;display:flex;flex-direction:column;min-height:0}
+#msgs{flex:1;overflow-y:auto;padding:16px 5%;display:flex;flex-direction:column;gap:6px;min-height:0;overscroll-behavior:contain;scroll-behavior:smooth;background-image:radial-gradient(var(--bd) 1px,transparent 1px);background-size:26px 26px}
+.mw{display:flex;flex-direction:column}.mr{display:flex}.mr.me{justify-content:flex-end}
+.dp{align-self:center;font-size:11px;padding:3px 12px;border-radius:99px;background:var(--pn2);color:var(--mu);border:1px solid var(--bd);margin:8px 0}
+.bub{position:relative;max-width:min(80%,520px);padding:9px 14px 5px;border-radius:18px 18px 18px 5px;background:var(--in);border:1px solid var(--bd);word-break:break-word;white-space:pre-wrap;box-shadow:0 8px 20px -14px #000}
+.me .bub{border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--ink);border-color:transparent;box-shadow:0 8px 26px -10px var(--ac)}
+.bub a{color:inherit;text-decoration:underline}.bub img,.bub video,.bub audio{border-radius:12px;max-height:280px;max-width:100%;display:block;cursor:pointer;margin:4px 0}
+.tm{font-size:10px;opacity:.65;text-align:right;margin-top:2px}
+.q{border-left:3px solid var(--ac);padding:3px 8px;margin-bottom:5px;background:rgba(0,0,0,.18);border-radius:6px;font-size:12px;opacity:.9}.me .q{border-color:var(--ink)}
+.q b{display:block;font-size:11px}
+.fl{display:flex;gap:8px;align-items:center;background:rgba(0,0,0,.12);border-radius:12px;padding:8px 10px;min-width:190px}
+.act{position:absolute;top:-17px;right:8px;display:flex;opacity:0;pointer-events:none;transition:.2s;background:var(--pn);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:2px;white-space:normal}
+.act button{padding:4px 6px}.act svg{width:15px;height:15px}.act button:hover{color:var(--ac)}.bub.sel .act,.bub:hover .act{opacity:1;pointer-events:auto}
+.reactions{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}.react-badge{font-size:11px;background:rgba(0,0,0,.25);padding:2px 6px;border-radius:99px;border:1px solid var(--bd)}
+.ent{animation:fadeUp .5s both}
+@keyframes flyL{0%{opacity:0;transform:perspective(900px) translate3d(-80px,60px,-520px) rotateY(50deg) rotateX(-25deg) scale(.6)}65%{opacity:1;transform:perspective(900px) translate3d(6px,-8px,50px) rotateY(-5deg) rotateX(3deg) scale(1.05)}100%{opacity:1;transform:perspective(900px)}}
+@keyframes flyR{0%{opacity:0;transform:perspective(900px) translate3d(80px,60px,-520px) rotateY(-50deg) rotateX(-25deg) scale(.6)}65%{opacity:1;transform:perspective(900px) translate3d(-6px,-8px,50px) rotateY(5deg) rotateX(3deg) scale(1.05)}100%{opacity:1;transform:perspective(900px)}}
+@keyframes ring{from{box-shadow:0 0 0 0 var(--ac)}to{box-shadow:0 0 0 24px transparent}}
+.f3l .bub{transform-origin:0 100%;animation:flyL .85s cubic-bezier(.2,.8,.2,1) both,ring 1.2s .55s ease-out}
+.f3r .bub{transform-origin:100% 100%;animation:flyR .7s cubic-bezier(.2,.8,.2,1) both}
+.no3d .f3l .bub,.no3d .f3r .bub{animation:fadeUp .3s both}.no3d *{animation-duration:.01s!important}
+@media(prefers-reduced-motion:reduce){.f3l .bub,.f3r .bub{animation:fadeUp .3s both}}
+#dn{position:absolute;right:18px;bottom:84px;z-index:4;transition:.3s}#dn.h{display:grid!important;opacity:0;transform:scale(.4);pointer-events:none}
+#prog{height:3px;background:var(--pn2)}#bar{height:3px;width:0;background:var(--ac);box-shadow:0 0 10px var(--ac);transition:width .2s}
+#rb{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--pn);border-top:1px solid var(--bd);animation:fadeUp .25s}#rb div{flex:1;min-width:0;border-left:3px solid var(--ac);padding-left:8px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{display:flex;gap:8px;padding:10px 12px;background:var(--pn);border-top:1px solid var(--bd);align-items:center;position:relative;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.sd{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--ink);box-shadow:0 0 20px -4px var(--ac);transition:.25s;flex-shrink:0}.sd:hover{transform:scale(1.1) rotate(-12deg)}.sd:active{transform:scale(.88)}
+.mn{position:absolute;bottom:70px;left:12px;background:var(--pn);border:1px solid var(--bd);border-radius:18px;padding:8px;z-index:6;animation:pop .35s cubic-bezier(.3,1.5,.5,1) both;transform-origin:bottom left;box-shadow:0 20px 50px -20px #000}
+#emenu{display:flex;flex-wrap:wrap;gap:2px;width:268px}#emenu button{width:40px;height:40px;font-size:21px;border-radius:10px;transition:.15s}#emenu button:hover{background:var(--pn2);transform:scale(1.25)}
+#amenu button{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;width:100%;font-size:13px}#amenu button:hover{background:var(--pn2);color:var(--ac)}
+
+#sp,#pp{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;transform:perspective(1500px) translateX(105%) rotateY(-30deg);transform-origin:100% 50%;opacity:0;visibility:hidden;transition:transform .65s cubic-bezier(.2,.9,.3,1),opacity .4s,visibility 0s .65s}
+#sp.on,#pp.on{transform:none;opacity:1;visibility:visible;transition-delay:0s}
+.wrap{max-width:640px;margin:auto;padding:0 16px 60px}.sbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:14px;padding:14px 0;background:var(--bg)}.sbar h2{font-size:22px}
+.pc{display:flex;gap:16px;align-items:center;padding:18px;border-radius:22px;background:linear-gradient(135deg,var(--pn2),var(--pn));border:1px solid var(--bd)}.pc .av{width:62px;height:62px}
+.acc{background:var(--pn);border:1px solid var(--bd);border-radius:20px;margin:12px 0;overflow:hidden;transition:.4s}.acc.o{border-color:var(--ac);box-shadow:0 0 28px -12px var(--ac)}
+#sp.on .acc,#sp.on .pc,#pp.on .acc,#pp.on .pc{animation:pop .7s cubic-bezier(.2,.9,.3,1) both;animation-delay:var(--d,0ms)}
+.ah{display:flex;align-items:center;gap:12px;padding:16px;width:100%;font-weight:600;text-align:left}.ah .ci{width:38px;height:38px;border-radius:12px;background:var(--pn2);color:var(--ac);display:grid;place-items:center}.ah>span{flex:1}.ah small{font-weight:400}
+.ah .ch{transition:transform .5s cubic-bezier(.3,1.5,.5,1)}.acc.o .ch{transform:rotate(180deg);color:var(--ac)}
+.bd{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,.9,.3,1)}.acc.o .bd{grid-template-rows:1fr}.bd>div{overflow:hidden}.bi{padding:0 16px 14px}
+.st{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--bd)}.st>div:first-child{min-width:0}
+.sw{width:48px;height:27px;border-radius:99px;background:var(--pn2);border:1px solid var(--bd);position:relative;transition:.3s;flex-shrink:0}.sw::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--mu);transition:.4s cubic-bezier(.3,1.6,.5,1)}
+.sw.on{background:var(--ac);border-color:var(--ac);box-shadow:0 0 14px -2px var(--ac)}.sw.on::after{transform:translateX(21px);background:var(--ink)}
+.opts{display:flex;gap:10px;flex-wrap:wrap}.tb{flex:1;min-width:90px;padding:12px;border-radius:14px;border:1px solid var(--bd);background:var(--pn2);font-size:13px;transition:.3s}.tb.on{border-color:var(--ac);color:var(--ac);box-shadow:0 0 18px -6px var(--ac);transform:translateY(-3px)}
+.dot{width:34px;height:34px;border-radius:50%;border:3px solid transparent;transition:.3s}.dot.on{border-color:var(--tx);transform:scale(1.18)}
+.bi input[type=range]{width:100%;accent-color:var(--ac)}.bi .inp{margin:6px 0 10px;border-radius:14px}.bi .pr,.bi .tb{margin-top:8px}.dg{color:#ff5252}
+.mc{background:var(--pn);color:var(--tx);border:1px solid var(--ac);box-shadow:0 0 40px -10px var(--ac);border-radius:24px;max-height:92vh;overflow:auto;animation:pop .5s cubic-bezier(.2,.9,.3,1) both;padding:22px;width:92vw;max-width:420px}
+#modal{position:fixed;inset:0;z-index:60;background:rgba(0,10,16,.6);display:grid;place-items:center;backdrop-filter:blur(6px)}
+#toast{position:fixed;bottom:28px;left:50%;z-index:90;background:var(--pn);border:1px solid var(--ac);border-radius:99px;padding:10px 20px;font-size:13px;box-shadow:0 0 24px -6px var(--ac);transform:translate(-50%,40px);opacity:0;pointer-events:none;transition:.4s cubic-bezier(.3,1.5,.5,1);max-width:90vw}#toast.on{transform:translate(-50%,0);opacity:1}
+#nt{position:fixed;top:14px;left:50%;z-index:95;width:min(380px,92vw);display:flex;gap:12px;align-items:center;padding:12px 14px;background:var(--pn);border:1px solid var(--ac);border-radius:20px;box-shadow:0 0 36px -8px var(--ac);transform:translateX(-50%) perspective(700px) translateY(-140%) rotateX(-75deg);transform-origin:top;opacity:0;transition:.7s cubic-bezier(.2,1.2,.3,1);cursor:pointer}
+#nt.on{transform:translateX(-50%) perspective(700px);opacity:1}#nt div{min-width:0}#nt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:7px 4px;text-align:left;border-top:1px solid var(--bd)}
+/* ===== ANIMATION & DESIGN UPGRADES ===== */
+#card{border:1.5px solid transparent;background:linear-gradient(var(--cardbg),var(--cardbg)) padding-box,linear-gradient(120deg,var(--ac),#4facfe,#a78bfa,#22d3ee,var(--ac)) border-box;background-size:100% 100%,300% 300%;animation:borderflow 7s linear infinite}
+@keyframes borderflow{to{background-position:0 0,300% 0}}
+.pr::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:shine3 3s ease-in-out infinite}
+@keyframes shine3{0%{left:-60%}55%,100%{left:130%}}
+.sd{animation:sdpulse 2.4s ease-in-out infinite}
+@keyframes sdpulse{50%{box-shadow:0 0 34px -2px var(--ac);transform:scale(1.06)}}
+.react-badge{animation:reactpop .45s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes reactpop{from{transform:scale(.3);opacity:0}}
+.row:active{transform:scale(.98)}
+.bub{transition:transform .2s,box-shadow .2s}
+.bub:hover{transform:translateY(-2px)}
+#nt.on{animation:ntglow 2s ease-in-out infinite}
+@keyframes ntglow{50%{box-shadow:0 0 52px -6px var(--ac)}}
+.lp h2{background:linear-gradient(120deg,var(--ac),var(--ac2),var(--ac));background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine3b 4s linear infinite}
+@keyframes shine3b{to{background-position:200% center}}
+.av{transition:transform .25s}
+.av:hover{transform:scale(1.06) rotate(3deg)}
+
+html,body{overscroll-behavior:none;-webkit-touch-callout:none;touch-action:manipulation}
+button,.hd,#side,#sp,#stories{user-select:none;-webkit-user-select:none}
+#msgs,#chats,#sp,.mc,#stories,.tbox{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.bub{user-select:text;-webkit-user-select:text}
+.hf{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0}
+.row{animation:none;content-visibility:auto;contain-intrinsic-size:64px}
+.sd{animation:none}.bub{transition:none}.bub:hover{transform:none}#nt.on{animation:none}
+#stories{display:flex;gap:12px;padding:6px 14px 10px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}#stories::-webkit-scrollbar{display:none}
+.sti{display:flex;flex-direction:column;align-items:center;gap:4px;width:62px;flex-shrink:0}.sti small{width:62px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.rg{position:relative;width:58px;height:58px;border-radius:50%;padding:3px;background:conic-gradient(var(--ac),var(--ac2),var(--ac));display:grid;place-items:center;transition:transform .2s}.rg:active{transform:scale(.92)}.rg.seen{background:var(--bd)}.rg.add{background:var(--pn2);border:1.5px dashed var(--ac)}
+.rg .av{width:100%;height:100%;border:2px solid var(--pn)}.rg i{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:var(--ac);color:var(--ink);font-style:normal;font-weight:700;display:grid;place-items:center;font-size:14px;line-height:1}
+.stx{border-radius:16px;min-height:170px;display:grid;place-items:center;padding:14px;transition:background .3s}.stx textarea{width:100%;height:140px;background:none;border:0;outline:0;resize:none;color:#fff;font-family:inherit;font-weight:600;font-size:20px;line-height:1.3;text-align:center}.stx textarea::placeholder{color:rgba(255,255,255,.7)}
+.stx.big{width:100%;height:100%;border-radius:0;color:#fff;font-weight:600;font-size:26px;text-align:center;word-break:break-word;white-space:pre-wrap}
+#sv{position:fixed;inset:0;z-index:80;background:#000;color:#fff;animation:pop .4s both}
+#svb{position:absolute;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;gap:4px;z-index:3}#svb span{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden}#svb i{display:block;height:100%;width:0;background:#fff}#svb i.f{width:100%}
+#svh{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 12px);left:10px;right:10px;display:flex;gap:10px;align-items:center;z-index:3}#svh>div{flex:1;min-width:0}#svh .av{width:38px;height:38px}#svh small{color:rgba(255,255,255,.75)}
+#svc{position:absolute;inset:0;display:grid;place-items:center}#svc img,#svc video{max-width:100%;max-height:100%;object-fit:contain}
+#svl,#svr{position:absolute;top:80px;bottom:0;z-index:2;width:40%}#svl{left:0}#svr{right:0;width:60%}
+#blk{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 14px;background:var(--pn);border-top:1px solid var(--bd);font-size:13px}#blk .tb{flex:none;min-width:0;padding:8px 16px}
+.sn{font-size:11px;font-weight:600;color:var(--ac);margin-bottom:2px}.me .sn{display:none}.cap{margin-top:4px}.mw.up{opacity:.85}
+.sup{display:block;padding:12px 14px;border-radius:14px;background:var(--pn2);border:1px solid var(--bd);text-decoration:none;color:var(--ac);font-weight:600;margin-bottom:10px;text-align:center}.sup small{color:var(--ac);opacity:.85;font-weight:400}
+.tbox{max-height:48vh;overflow-y:auto;font-size:13px;color:var(--mu);line-height:1.6;padding-right:6px;margin:8px 0}.tbox h4{color:var(--tx);margin:12px 0 2px;font-size:13px}
+
+body.gold{--bg:#0b0907;--pn:#14100b;--pn2:#211a10;--tx:#f6ead0;--mu:#a8987a;--bd:rgba(212,175,55,.26);--in:#1d160d;--ink:#1a1204;--l1:#2a200f;--l2:#080604;--cardbg:rgba(20,16,11,.92);--rpa:#8a6b1c;--rpb:#2a200f;--fd:'Cormorant Garamond',serif}
+body.emerald{--bg:#04100c;--pn:#08201a;--pn2:#0e2f26;--tx:#e6fff6;--mu:#7fb5a2;--bd:rgba(52,211,153,.26);--in:#0e2f26;--ink:#02120d;--l1:#0d3a2e;--l2:#030c09;--cardbg:rgba(8,32,26,.92);--rpa:#0f7a5a;--rpb:#052a20;--fd:'Cormorant Garamond',serif}
+body.rose{--bg:#180b12;--pn:#241019;--pn2:#341a26;--tx:#ffe9f0;--mu:#c79aab;--bd:rgba(244,166,184,.3);--in:#341a26;--ink:#2a0615;--l1:#4a1a30;--l2:#12060c;--cardbg:rgba(36,16,25,.92);--rpa:#b03a66;--rpb:#4a1a30;--fd:'Cormorant Garamond',serif}
+body.hc{--bd:rgba(255,255,255,.4);--mu:#cfcfcf}
+h2,h3,.rt h3{font-family:var(--fd,inherit)}body.gold h3,body.emerald h3,body.rose h3,body.gold h2,body.emerald h2,body.rose h2{letter-spacing:.4px}
+.hd{background:linear-gradient(180deg,var(--pn),var(--pn2))}#side{background:linear-gradient(180deg,var(--pn),var(--bg))}
+.hd .av,.row .av{border:0;box-shadow:0 0 0 2px var(--pn),0 0 0 3.5px var(--ac)}
+.me .bub{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 26px -10px var(--ac)}.pr{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 24px -6px var(--ac)}
+#msgs{box-shadow:inset 0 0 120px -70px var(--ac)}.acc,.pc,.mc{backdrop-filter:none}
+.row.sel{background:var(--pn2);outline:1px solid var(--ac)}.row .tg{display:flex;gap:4px;color:var(--mu)}.row .tg svg{width:14px;height:14px}.row .ck{width:22px;height:22px;border-radius:50%;background:var(--ac);color:var(--ink);display:grid;place-items:center}.row .ck svg{width:14px;height:14px}
+.dlph{display:flex;align-items:center;gap:8px;padding:16px 20px;border-radius:12px;background:rgba(0,0,0,.18);font-size:12px;min-width:170px;color:inherit}
+.pin{text-align:center;letter-spacing:8px;font-size:20px}.lkic{width:54px;height:54px;border-radius:18px;margin:0 auto;display:grid;place-items:center;color:var(--ac);border:1px solid var(--ac);box-shadow:0 0 24px -6px var(--ac)}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.gal img,.gal .vd{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:pointer;background:var(--pn2);display:grid;place-items:center}
+.thg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.thg .tb{padding:0;overflow:hidden;text-align:left;min-width:0}.thg .tb span{display:block;padding:8px 10px}
+.bi>.tb{display:block;width:100%}
+</style></head><body>
+<div id="splash"><div class="lg" data-i="chat"></div></div>
+
+<div id="login" class="h"><canvas id="fx"></canvas>
+ <div id="card">
+  <div class="lp"><h2>Sign in</h2><div class="tg">Private messenger. Fast, simple, ad-free.</div>
+   <label class="tc"><input type="checkbox" id="terms"><i></i><span>I am 16 or older and agree to the <u id="tlink">Terms &amp; Conditions</u></span></label>
+   <button id="gbtn" class="pr gb" disabled><svg viewBox="0 0 48 48" style="stroke:none;width:20px;height:20px"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 010-9.4l-7.9-6.1a24 24 0 000 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg><span id="gtx">Continue with Google</span></button>
+   <p id="lerr"></p></div>
+  <div class="rpw"><div class="rp"><span class="fb" style="right:9%;top:12%">Hey, are you there?</span><span class="fb" style="right:24%;top:26%;animation-delay:-1.5s">Photos, files, groups</span><div class="rt"><h3>Welcome back!</h3><p>Your chats are waiting for you.</p></div></div></div>
+ </div></div>
+
+ <div id="setup" class="h" style="position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg)">
+ <div class="mc" style="text-align:center"><h2 style="margin-bottom:4px">Choose a username</h2><small style="margin-bottom:16px">3–20 letters, numbers or underscore</small>
+  <input id="uname" class="inp" maxlength="20" placeholder="username" autocomplete="off"><p id="uerr" style="color:#ff5252;font-size:12px;min-height:22px;margin:6px 0"></p>
+  <label class="tc" style="justify-content:center;margin:4px 0 14px"><input type="checkbox" id="age16"><i></i><span>I am 16 years or older</span></label>
+  <button id="ubtn" class="pr">Get started</button></div></div>
+
+<div id="app" class="h">
+ <aside id="side">
+  <div class="hd" id="sidehd"><img id="myimg" class="av" alt=""><div class="nm"><b id="myname"></b><small><i class="on-d"></i>Online</small></div>
+   <button id="grpbtn" class="ib" title="New group" data-i="users"></button><button id="setbtn" class="ib" title="Settings" data-i="sliders"></button></div>
+  <div class="hd h" id="selbar"><button id="selx" class="ib" data-i="x"></button><b id="selcnt" style="flex:1">0</b><button id="selpin" class="ib" data-i="pin"></button><button id="selarc" class="ib" data-i="archive"></button><button id="seldel" class="ib" data-i="trash"></button></div>
+  <div style="padding:12px 12px 4px"><input id="search" class="inp" placeholder="Search username" autocomplete="off"><div id="results"></div>
+   <button id="arcview" class="row" style="padding:8px 12px;color:var(--mu);font-size:13px"><span data-i="archive"></span><span id="arcview-txt">Show archived chats</span></button></div>
+  <div id="stories"></div>
+  <div id="chats"></div>
+ </aside>
+ <main id="main">
+  <div id="emp"><div class="cube"><i></i><i></i><i></i><i></i><i></i><i></i></div><b style="font-size:18px;color:var(--tx)">abchat</b><p style="font-size:13px;margin-top:4px">Pick a chat or search a username to start.</p></div>
+  <div id="chat" class="h">
+   <div class="hd"><button id="back" class="ib" data-i="back"></button><img id="pimg" class="av" alt="" style="cursor:pointer"><div class="nm" id="pinfo-btn"><b id="pname"></b><small id="pseen"></small></div></div>
+   <div id="msgs"></div><button id="dn" class="ib h" data-i="down"></button>
+   <div id="prog" class="h"><div id="bar"></div></div>
+   <div id="rb" class="h"><div id="rbt"></div><button id="rbx" class="ib" style="width:30px;height:30px" data-i="x"></button></div>
+   <div id="blk" class="h"><span>You blocked this user</span><button id="unblk" class="tb">Unblock</button></div>
+   <div class="bar"><div id="emenu" class="mn h"></div><div id="amenu" class="mn h" style="left:56px"><button id="apic"><span data-i="clip"></span>Gallery (photo / video)</button><button id="acam"><span data-i="smile"></span>Camera</button><button id="adoc"><span data-i="clip"></span>Document</button><button id="audbtn"><span data-i="bell"></span>Voice Note</button></div>
+    <button id="ebtn" class="ib" data-i="smile"></button><button id="abtn" class="ib" data-i="clip"></button>
+    <input id="msg" class="inp" placeholder="Type a message" autocomplete="off" maxlength="2000"><button id="send" class="sd" data-i="send"></button></div>
+  </div>
+ </main>
+</div>
+<div id="sp"></div><div id="pp"></div><div id="modal" class="h"></div><div id="toast"></div><div id="nt"></div>
+<div id="sv" class="h"><div id="svb"></div><div id="svh"><img class="av" alt=""><div><b></b><small></small></div><button id="svd" class="ib h" data-i="trash"></button><button id="svx" class="ib" data-i="x"></button></div><div id="svc"></div><i id="svl"></i><i id="svr"></i></div>
+<input id="fmedia" type="file" accept="image/*,video/*" class="hf"><input id="fcam" type="file" accept="image/*,video/*" capture="environment" class="hf"><input id="fdoc" type="file" class="hf"><input id="favatar" type="file" accept="image/*" class="hf"><input id="fbg" type="file" accept="image/*" class="hf"><input id="fstory" type="file" accept="image/*,video/*" class="hf">
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {GoogleAuthProvider,signInWithRedirect,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut,getAuth,setPersistence,browserLocalPersistence,initializeAuth,indexedDBLocalPersistence,browserSessionPersistence,browserPopupRedirectResolver} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,addDoc,runTransaction,serverTimestamp,getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getStorage,ref,uploadBytesResumable,uploadBytes,getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// Keep these values aligned with your Firebase project. Google sign-in also requires the hosting domain in Firebase Auth > Settings > Authorized domains.
+const firebaseConfig={apiKey:"AIzaSyC8_li0jyr4R1Ov5KLZmv5lzsx7VoevYW4",authDomain:"chatly-eb71a.firebaseapp.com",projectId:"chatly-eb71a",storageBucket:"chatly-eb71a.firebasestorage.app",messagingSenderId:"750656487876",appId:"1:750656487876:web:c3b703c5bdada4b0496491"};
+const ADMIN_EMAIL="arbaab9089@gmail.com";
+const SUP_EMAIL="sheikharbaab419@gmail.com";
+const $=i=>document.getElementById(i);
+
+let app, auth, db, storage;
+try{
+  app=initializeApp(firebaseConfig);
+  try{auth=initializeAuth(app,{persistence:[indexedDBLocalPersistence,browserLocalPersistence,browserSessionPersistence],popupRedirectResolver:browserPopupRedirectResolver})}catch{auth=getAuth(app)}
+  try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch{db=getFirestore(app)}
+  storage=getStorage(app);
+}catch(e){console.error("Firebase init error:",e)}
+
+const show=id=>['login','setup','app'].forEach(x=>$(x)?.classList.toggle('h',x!==id));
+const hideSplash=()=>{const s=$('splash');if(s){s.classList.add('x');setTimeout(()=>s.remove(),500)}};
+
+setTimeout(()=>{hideSplash();if($('login')?.classList.contains('h')&&$('app')?.classList.contains('h')&&$('setup')?.classList.contains('h'))show('login')},9000);
+
+const I={chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',clip:'<path d="M21 12l-9 9a5 5 0 01-7-7l9-9a3.5 3.5 0 015 5l-9 9a2 2 0 01-3-3l8-8"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>',archive:'<path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>',reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 00-4-4H4"/>',copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',down:'<path d="M6 9l6 6 6-6"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',palette:'<circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1"/><circle cx="16" cy="10" r="1"/>',bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6"/>'};
+Object.assign(I,{pin:'<path d="M12 17v5M9 3h6l-1 7 4 3v2H6v-2l4-3z"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',download:'<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',mute:'<path d="M11 5L6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6"/>',check:'<path d="M20 6L9 17l-5-5"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/>',db:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>'});
+const ic=n=>`<svg viewBox="0 0 24 24">${I[n]||''}</svg>`;
+document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^(https:\/\/|data:image\/)/i.test(u||'')?u:'';
+const link=s=>s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+let tt;const toast=m=>{const t=$('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3200)};
+
+const V=[];let ign=0;
+const vpush=(n,fn)=>{if(V.some(v=>v.n===n))return;V.push({n,fn});history.pushState({n},'')};
+const vdrop=n=>{const i=V.findIndex(v=>v.n===n);if(i<0)return;const top=i===V.length-1;V.splice(i,1);if(top){ign++;history.back()}};
+addEventListener('popstate',()=>{if(ign>0){ign--;return}const v=V.pop();v&&v.fn()});
+const modal=h=>{$('modal').innerHTML=`<div class="mc">${h}</div>`;$('modal').classList.remove('h');vpush('modal',()=>closeModal())};
+const closeModal=()=>{$('modal').classList.add('h');vdrop('modal')};window.closeModal=closeModal;
+$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+const btnLoad=(b,on,t)=>{if(!b)return;if(on){b.dataset.o=b.innerHTML;b.disabled=true;b.innerHTML='<span class="spin"></span>'+(t||'Please wait')}else{b.disabled=false;if(b.dataset.o)b.innerHTML=b.dataset.o}};
+
+const ACS={lilac:['#9b8cff','#ff9ec7'],gold:['#d4af37','#f2d98b'],emerald:['#34d399','#86efc9'],rosegold:['#f4a6b8','#ffd0d8'],mint:['#2fd0a0','#7be8c8'],peach:['#ff9a76','#ffc27a'],sky:['#4fb3ff','#8be0ff'],cyan:['#00f2fe','#4facfe']},THEME_AC={soft:'lilac',light:'sky',neon:'cyan',amoled:'cyan',gold:'gold',emerald:'emerald',rose:'rosegold'};
+let savedSettings={};
+try{savedSettings=JSON.parse(localStorage.getItem('abchat_s')||'{}')||{}}catch{localStorage.removeItem('abchat_s')}
+let me,profile,cur,unsubs=[],chatsUnsub,presence,userCache=new Map(),tokR=0,arcOnly=false,lastRows=[],booted=false,storyUns=[],myBlocked=new Set();
+
+const S=Object.assign({sound:1,enter:1,theme:'soft',ac:'lilac',fs:15,fx3d:1,desk:0,pop:1,hideSeen:0,dlImg:'always',dlVid:'wifi',q:'std',emojiPanel:0,hc:0,dlFrom:0,customBg:''},savedSettings);
+if(!savedSettings.v3){S.theme='soft';S.ac='lilac';S.v3=1}
+if(!['soft','neon','light','amoled','gold','emerald','rose'].includes(S.theme))S.theme='soft';
+if(!ACS[S.ac])S.ac='lilac';
+const save=()=>localStorage.setItem('abchat_s',JSON.stringify(S));
+let accol='#9b8cff';
+function applyS(){const a=ACS[S.ac]||ACS.cyan,r=document.documentElement.style;r.setProperty('--ac',a[0]);r.setProperty('--ac2',a[1]);r.setProperty('--fs',S.fs+'px');accol=a[0];
+ document.body.className=S.theme+(S.fx3d?'':' no3d')+(S.hc?' hc':'');const m=$('msgs');if(m&&!cur?.customBg){m.style.backgroundImage=S.customBg?`url(${S.customBg})`:'';m.style.backgroundSize=S.customBg?'cover':''}}
+applyS();
+
+let AC_;const beep=(f=880,d=.12)=>{if(!S.sound)return;try{AC_=AC_||new AudioContext();AC_.resume();const o=AC_.createOscillator(),g=AC_.createGain();o.frequency.value=f;o.connect(g);g.connect(AC_.destination);g.gain.setValueAtTime(.06,AC_.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC_.currentTime+d);o.start();o.stop(AC_.currentTime+d)}catch{}};
+const chime=()=>{beep(988);setTimeout(()=>beep(1318,.16),90)};
+const ago=ts=>{if(!ts)return'';const s=(Date.now()-ts.toDate())/1e3;return s<90?'online':s<3600?'last seen '+Math.floor(s/60)+'m ago':s<86400?'last seen '+Math.floor(s/3600)+'h ago':'last seen '+ts.toDate().toLocaleDateString()};
+const avatar=u=>u?.photoURL||'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#e7e1ff"/><text x="20" y="27" font-size="18" text-anchor="middle" fill="${accol}" font-family="Plus Jakarta Sans">${esc((u?.name||u?.username||u?.groupName||'?')[0]?.toUpperCase())}</text></svg>`);
+const LSget=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||d)||JSON.parse(d)}catch{return JSON.parse(d)}},lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+let NICK=LSget('abchat_nick','{}'),PIN_=new Set(LSget('abchat_pin','[]')),MUTE=new Set(LSget('abchat_mute','[]')),CLR=LSget('abchat_clr','{}'),HID=LSget('abchat_hid','{}'),LOCK=LSget('abchat_lock','{}'),DL=LSget('abchat_dl','{}');
+const DEC=new Map(),UNL=new Set(),APP_V='3.0';
+const nm=u=>NICK[u?.uid]||u?.name||u?.username||'User';
+const dlabel=d=>{const t=new Date(),y=new Date(Date.now()-864e5);return d.toDateString()===t.toDateString()?'Today':d.toDateString()===y.toDateString()?'Yesterday':d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
+const fsize=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+
+const loadImg=f=>new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=URL.createObjectURL(f)});
+async function scaled(f,max,q,sq){const i=await loadImg(f),c=document.createElement('canvas');if(sq){const s=Math.min(i.width,i.height);c.width=c.height=max;c.getContext('2d').drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,max,max)}else{const k=Math.min(1,max/Math.max(i.width,i.height));c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height)}return{url:c.toDataURL('image/jpeg',q),blob:()=>new Promise(r=>c.toBlob(r,'image/jpeg',q))}}
+
+const HAS_CRYPTO=!!(window.crypto&&crypto.subtle&&crypto.subtle.generateKey),PLAIN_IV='B64PLAIN',te=new TextEncoder(),td=new TextDecoder(),EC={name:'ECDH',namedCurve:'P-256'};
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let myPriv,myPubStr;
+async function initKeys(uid){if(!HAS_CRYPTO){myPubStr='fallback';myPriv=null;return}
+ const k='abchat_keys_'+uid;let s=localStorage.getItem(k);
+ if(!s){const kp=await crypto.subtle.generateKey(EC,true,['deriveKey']);s=JSON.stringify({priv:await crypto.subtle.exportKey('jwk',kp.privateKey),pub:await crypto.subtle.exportKey('jwk',kp.publicKey)})}
+ localStorage.setItem(k,s);const o=JSON.parse(s);myPriv=await crypto.subtle.importKey('jwk',o.priv,EC,false,['deriveKey']);myPubStr=JSON.stringify(o.pub)}
+const keyCache=new Map();
+async function keyFor(p){if(!HAS_CRYPTO||!p?.pubKey||p.pubKey==='fallback')return null;const id=p.uid+p.pubKey;
+ if(!keyCache.has(id)){const pub=await crypto.subtle.importKey('jwk',JSON.parse(p.pubKey),EC,false,[]);keyCache.set(id,await crypto.subtle.deriveKey({name:'ECDH',public:pub},myPriv,{name:'AES-GCM',length:256},false,['encrypt','decrypt']))}return keyCache.get(id)}
+async function encrypt(key,t){if(!key)return{ct:btoa(unescape(encodeURIComponent(t))),iv:PLAIN_IV};const iv=crypto.getRandomValues(new Uint8Array(12));return{ct:b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,te.encode(t))),iv:b64(iv)}}
+async function decrypt(key,m){if(!m)return'Message unavailable';if(m.iv===PLAIN_IV){try{return decodeURIComponent(escape(atob(m.ct)))}catch{return'Message unavailable'}}
+ try{return td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(m.iv)},key,unb64(m.ct)))}catch{return'Message unavailable'}}
+
+let RD={};try{RD=JSON.parse(localStorage.getItem('abchat_rd')||'{}')||{}}catch{localStorage.removeItem('abchat_rd')}const markRead=id=>{RD[id]=Date.now();try{localStorage.setItem('abchat_rd',JSON.stringify(RD))}catch{}};
+const chatId=(a,b)=>[a,b].sort().join('_');
+
+async function getUser(uid){
+  if(!uid||uid==='undefined')return null;
+  if(userCache.has(uid))return userCache.get(uid);
+  try{const x=await getDoc(doc(db,'users',uid));
+    if(!x.exists())return{uid,name:'Unknown user',username:'unknown',photoURL:''};
+    const u={uid,...x.data()};userCache.set(uid,u);return u}
+  catch{return{uid,name:'User',username:'user',photoURL:''}}
+}
+
+const TERMS_HTML=`<h4>1. Who can use abchat</h4>You must be at least 16 years old. If you are under 18, you confirm that a parent or guardian allows you to use abchat wherever local law requires it. We may remove accounts that we believe belong to someone under 16.
+<h4>2. Your account</h4>You sign in with Google and choose a unique username. You are responsible for everything that happens under your account. Give accurate information, do not impersonate anyone, and do not share or sell your account.
+<h4>3. Acceptable use</h4>Do not use abchat to: break any law; harass, threaten, bully or stalk anyone; share hate speech, extreme violence or sexual content involving minors (reported to the authorities); send spam, scams or phishing; spread malware; collect other people's data; or try to disrupt or reverse engineer the service.
+<h4>4. Your content</h4>You keep ownership of the messages, photos, videos, files and statuses you share. You give abchat permission to store, transmit and display them only as needed to run the service. You promise you own or have the right to share what you upload. Do not upload anything you are not allowed to share.
+<h4>5. Statuses (stories)</h4>A status disappears from the app after 24 hours. Public means every abchat user can view it. Private means only the people you select can view it. Anyone who can see a status may screenshot or record it, so only post what you are comfortable sharing.
+<h4>6. Privacy and encryption</h4>One-to-one messages are end-to-end encrypted with keys that stay on your device. If you clear your browser or app data, or switch device, you may lose the ability to read older messages. Group messages, photos, videos, files and statuses are not end-to-end encrypted and are stored on Google Firebase servers.
+<h4>7. Data we store</h4>Your name, username, profile photo, about text, email, last-active time, chat metadata and the files you upload. We do not sell your personal data. You can ask for your account and data to be deleted through the support email below.
+<h4>8. Blocking and reporting</h4>You can block any user from their profile. Blocked users cannot message you and you will not see their messages or statuses. You can report abuse from a user's profile. We may review reports and act on them.
+<h4>9. Moderation and suspension</h4>We may warn, limit, suspend or remove accounts and content that break these Terms, put others at risk, or are required by law, with or without notice.
+<h4>10. Disappearing messages</h4>Disappearing messages are a convenience, not a guarantee. The other person may still copy, forward or screenshot what you send.
+<h4>11. Third-party services</h4>abchat uses Google sign-in and Firebase. Their own terms and privacy policies also apply to your use of those services.
+<h4>12. No emergency use</h4>abchat is not designed for emergencies or critical communication. Do not rely on it for medical, legal or safety needs.
+<h4>13. Disclaimer</h4>abchat is provided "as is" and "as available" without warranties of any kind. We do not promise that it will be uninterrupted, error free or that messages will always be delivered.
+<h4>14. Limitation of liability</h4>To the fullest extent allowed by law, abchat and its owners are not liable for indirect or consequential losses, lost data, or content posted by users. Nothing here limits rights that cannot be limited by law.
+<h4>15. Your responsibility</h4>You agree to compensate abchat for claims, losses or costs that result from your content or from breaking these Terms.
+<h4>16. Changes and ending</h4>We may update these Terms. If you keep using abchat after an update, you accept it. You may stop using abchat at any time. We may end or change the service.
+<h4>17. Governing law</h4>These Terms follow the laws that apply where the service owner is based, and disputes go to the courts there, unless your local consumer law says otherwise.
+<h4>18. Contact</h4>Questions, reports or data requests: sheikharbaab419@gmail.com`;
+if($('terms')) $('terms').onchange=()=>{if($('gbtn')) $('gbtn').disabled=!$('terms').checked};
+if($('tlink')) $('tlink').onclick=e=>{e.preventDefault();e.stopPropagation();modal(`<h3>Terms &amp; Conditions</h3><div id="tbox" class="tbox">${TERMS_HTML}</div><small id="thint" style="margin-bottom:10px">Scroll to the end to enable “I agree”.</small><button id="tok" class="pr" disabled>I agree</button>`);
+ const bx=$('tbox'),chk=()=>{if(bx.scrollTop+bx.clientHeight>=bx.scrollHeight-10){$('tok').disabled=false;$('thint').textContent=''}};bx.onscroll=chk;chk();
+ $('tok').onclick=()=>{$('terms').checked=true;$('gbtn').disabled=false;closeModal()}};
+
+function authErrorMessage(e){
+ const c=e?.code||'';
+ const messages={
+  'auth/unauthorized-domain':'This website domain is not authorized in Firebase. Add this domain in Firebase Console → Authentication → Settings → Authorized domains.',
+  'auth/operation-not-allowed':'Google sign-in is disabled. Enable Google under Firebase Console → Authentication → Sign-in method.',
+  'auth/popup-blocked':'The sign-in popup was blocked. Allow popups or try again.',
+  'auth/popup-closed-by-user':'Google sign-in was closed before completion. Please try again.',
+  'auth/cancelled-popup-request':'A sign-in window is already opening. Please wait.',
+  'auth/network-request-failed':'Network error. Check your internet connection and try again.',
+  'auth/invalid-api-key':'Firebase API key is invalid. Check the Firebase configuration.',
+  'auth/invalid-oauth-client-id':'Google OAuth client configuration is invalid. Check Firebase and Google Cloud settings.'
+ };
+ return messages[c]||`Login failed (${c||'unknown error'}): ${e?.message||'Please check Firebase configuration and try again.'}`;
+}
+const IN_APP=/\bwv\b|; wv\)|Nativine|FBAN|FBAV|Instagram/i.test(navigator.userAgent)||matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if($('gbtn')) $('gbtn').onclick=async e=>{e.preventDefault();
+ if(!$('terms').checked)return toast('Please read and accept the Terms first');
+ const err=$('lerr');err.textContent='';
+ if(!auth){err.textContent='Firebase could not start. Check your internet connection.';return}
+ btnLoad($('gbtn'),true,'Opening Google');
+ const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ try{
+  if(IN_APP){await signInWithRedirect(auth,provider);return}
+  await signInWithPopup(auth,provider);
+ }catch(ex){const c=ex?.code||'';
+  if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'].includes(c)){try{await signInWithRedirect(auth,provider);return}catch(re){err.textContent=authErrorMessage(re)}}
+  else err.textContent=authErrorMessage(ex);
+  btnLoad($('gbtn'),false);$('gbtn').disabled=!$('terms').checked}};
+
+if(auth){
+ getRedirectResult(auth).then(r=>{if(r)toast('Welcome back')}).catch(e=>{const err=$('lerr');if(err)err.textContent=authErrorMessage(e);btnLoad($('gbtn'),false)});
+ const onUser=async u=>{clearInterval(presence);chatsUnsub?.();storyUns.forEach(f=>f());storyUns=[];closeChat();closeModal();userCache.clear();booted=false;
+  if(!u){me=null;show('login');hideSplash();btnLoad($('gbtn'),false);$('gbtn').disabled=!$('terms').checked;return}
+  me=u;btnLoad($('gbtn'),false);
+  let data=null;
+  try{const x=await getDoc(doc(db,'users',u.uid));if(!x.exists()){show('setup');hideSplash();return}
+   data=x.data();try{const {lastActive,...rest}=data;localStorage.setItem('abchat_p_'+u.uid,JSON.stringify(rest))}catch{}}
+  catch(e){console.error(e);try{data=JSON.parse(localStorage.getItem('abchat_p_'+u.uid)||'null')}catch{}
+   if(!data){show('login');$('lerr').textContent='Could not load your profile. Check your internet and reopen the app.';hideSplash();return}toast('Offline mode')}
+  profile={uid:u.uid,...data};userCache.set(u.uid,profile);
+  if(profile.disabled){alert('Your account has been disabled by admin.');signOut(auth);return}
+  try{await boot()}catch(be){console.error(be);show('app');toast('Connected in limited mode')}
+  hideSplash()};
+ (auth.authStateReady?auth.authStateReady():Promise.resolve()).catch(()=>{}).then(()=>onAuthStateChanged(auth,onUser));
+}
+
+if($('ubtn')) $('ubtn').onclick=async()=>{const n=$('uname').value.trim().toLowerCase(),err=$('uerr');if(err)err.textContent='';
+ if(!/^[a-z0-9_]{3,20}$/.test(n)){if(err)err.textContent='Use 3–20 letters, numbers or _';return}
+ if(!$('age16')?.checked){if(err)err.textContent='You must be 16 or older to use abchat.';return}
+ btnLoad($('ubtn'),true,'Setting up');
+ try{await initKeys(me.uid);
+  await runTransaction(db,async tx=>{const ur=doc(db,'usernames',n);if((await tx.get(ur)).exists())throw new Error('taken');tx.set(ur,{uid:me.uid});
+   tx.set(doc(db,'users',me.uid),{username:n,usernameLower:n,name:me.displayName||n,about:'Hey there! I am using abchat.',photoURL:'',pubKey:myPubStr,lastActive:serverTimestamp(),disabled:false});
+   tx.set(doc(db,'userPrivate',me.uid),{email:me.email,displayName:me.displayName||'',createdAt:serverTimestamp()})});
+  profile={uid:me.uid,...(await getDoc(doc(db,'users',me.uid))).data()};await boot()}
+ catch(e){if(err)err.textContent=e.message==='taken'?'Username already taken.':'Error: '+e.message;btnLoad($('ubtn'),false)}};
+
+async function boot(){if(booted)return;booted=true;await initKeys(me.uid);
+ if(profile.pubKey!==myPubStr){await updateDoc(doc(db,'users',me.uid),{pubKey:myPubStr}).catch(()=>{});profile.pubKey=myPubStr}
+ paintMe();const beat=()=>updateDoc(doc(db,'users',me.uid),{lastActive:serverTimestamp()}).catch(()=>{});beat();presence=setInterval(beat,60000);
+ show('app');$('app').classList.remove('open');loadBlocked();listenChats();listenStories()}
+const paintMe=()=>{$('myimg').src=avatar(profile);$('myname').textContent=nm(profile)};
+if($('myimg')) $('myimg').onclick=$('setbtn').onclick=()=>openSettings();
+
+let st;if($('arcview')) $('arcview').onclick=()=>{arcOnly=!arcOnly;$('arcview-txt').textContent=arcOnly?'Show all chats':'Show archived chats';paintChats(lastRows)};
+if($('search')) $('search').oninput=e=>{clearTimeout(st);const q=e.target.value.trim().toLowerCase().replace(/^@/,''),r=$('results');if(!q){r.innerHTML='';return}
+ st=setTimeout(async()=>{const found=new Map(),add=d=>{if(d.id!==me.uid)found.set(d.id,{uid:d.id,...d.data()})};
+  const pre=f=>getDocs(query(collection(db,'users'),where(f,'>=',q),where(f,'<=',q+'\uf8ff'),limit(8))).then(s=>s.forEach(add)).catch(()=>{});
+  await Promise.all([pre('usernameLower'),pre('username'),getDoc(doc(db,'usernames',q)).then(async s=>{if(s.exists()&&s.data().uid!==me.uid){const u=await getUser(s.data().uid);if(u)found.set(u.uid,u)}}).catch(()=>{})]);
+  if($('search').value.trim().toLowerCase().replace(/^@/,'')!==q)return;r.innerHTML='';
+  found.forEach(u=>{userCache.set(u.uid,u);const b=document.createElement('button');b.className='row';b.innerHTML=`<img src="${esc(avatar(u))}" class="av"><div class="nm"><b>${esc(nm(u))}</b><small>@${esc(u.username)}</small></div>`;b.onclick=()=>{$('search').value='';r.innerHTML='';openChat(u)};r.appendChild(b)});
+  if(!found.size)r.innerHTML='<div class="empty">No user found for “'+esc(q)+'”.</div>'},250)};
+
+const pvCache=new Map();let prevT=new Map(),firstList=true;
+function listenChats(){firstList=true;prevT=new Map();chatsUnsub=onSnapshot(query(collection(db,'chats'),where('members','array-contains',me.uid)),async snap=>{
+ const rows=await Promise.all(snap.docs.map(async d=>{const c=d.data({serverTimestamps:'estimate'}),isG=c.isGroup;let name=c.groupName||'Group',pic='',pv=isG?`${c.members.length} members`:'Say hi 👋';
+  let peerUid = null;
+  if(isG){ pic=c.groupPhoto||avatar({name}); }
+  else{
+    peerUid = (c.members||[]).find(x=>x!==me.uid);
+    if(!peerUid || peerUid === me.uid) return null;
+    const p=await getUser(peerUid);
+    name=nm(p);pic=avatar(p);
+    if(c.pv&&p?.pubKey){const ck=d.id+c.pv.ct;if(!pvCache.has(ck)){let t=await decrypt(await keyFor(p).catch(()=>null),c.pv);pvCache.set(ck,t==='Message unavailable'?'New message':t)}pv=pvCache.get(ck)}
+  }
+  const t=c.updatedAt?.toMillis?.()||0,unread=!!c.lastFrom&&c.lastFrom!==me.uid&&t>(RD[d.id]||0)&&cur?.id!==d.id;
+  if(!firstList&&unread&&t>(prevT.get(d.id)||0)&&!myBlocked.has(peerUid)&&!MUTE.has(d.id))notify(name,LOCK[d.id]?avatar({name}):pic,LOCK[d.id]?'New message':pv,{uid:d.id,isGroup:isG,groupName:c.groupName,groupPhoto:c.groupPhoto,members:c.members});
+  prevT.set(d.id,t);return{id:d.id,c,peerUid,name,pic,pv,t,unread,isArchived:c.archivedBy?.[me.uid]||false}}));
+ const validRows=rows.filter(Boolean);firstList=false;validRows.sort((a,b)=>b.t-a.t);lastRows=validRows;paintChats(validRows)})}
+
+let SEL=new Set();
+function paintChats(rows){const box=$('chats');if(!box)return;rows=rows||[];
+ const list=rows.filter(r=>(arcOnly?r.isArchived:!r.isArchived)&&!(HID[r.id]&&r.t<=HID[r.id])).sort((a,b)=>(PIN_.has(b.id)-PIN_.has(a.id))||b.t-a.t);
+ if(!list.length){box.innerHTML=`<div class="empty">${arcOnly?'No archived chats.':'No chats yet. Search above.'}</div>`;return}
+ const f=document.createDocumentFragment();
+ list.forEach(({id,c,name,pic,pv,unread},i)=>{const b=document.createElement('button'),lk=LOCK[id];b.className='row'+(SEL.has(id)?' sel':'');b.dataset.id=id;
+  b.innerHTML=`<img src="${esc(lk?avatar({name}):pic)}" class="av"><div class="nm"><b>${esc(name)}</b><small>${esc(lk?'Locked chat':pv)}</small></div>${unread&&!lk?'<i class="ud"></i>':''}<span class="tg">${PIN_.has(id)?ic('pin'):''}${MUTE.has(id)?ic('mute'):''}${lk?ic('lock'):''}</span>${SEL.has(id)?`<span class="ck">${ic('check')}</span>`:''}`;f.appendChild(b)});
+ box.innerHTML='';box.appendChild(f)}
+let lpT,lpDone=false;
+$('chats').addEventListener('pointerdown',e=>{const b=e.target.closest('.row');if(!b)return;lpDone=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpDone=true;toggleSel(b.dataset.id);navigator.vibrate?.(15)},430)});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>$('chats').addEventListener(ev,()=>clearTimeout(lpT)));
+$('chats').addEventListener('scroll',()=>clearTimeout(lpT),{passive:true});
+$('chats').addEventListener('contextmenu',e=>{if(e.target.closest('.row'))e.preventDefault()});
+$('chats').onclick=e=>{const b=e.target.closest('.row');if(!b)return;if(lpDone){lpDone=false;return}if(SEL.size)return toggleSel(b.dataset.id);
+ const r=lastRows.find(x=>x.id===b.dataset.id);if(!r)return;openChat(r.c.isGroup?{uid:r.id,isGroup:true,groupName:r.c.groupName,groupPhoto:r.c.groupPhoto,members:r.c.members}:{uid:r.peerUid})};
+function toggleSel(id){SEL.has(id)?SEL.delete(id):SEL.add(id);updSel()}
+function clearSel(){SEL.clear();updSel()}
+function updSel(){const on=SEL.size>0;$('sidehd').classList.toggle('h',on);$('selbar').classList.toggle('h',!on);$('selcnt').textContent=SEL.size+' selected';on?vpush('sel',()=>clearSel()):vdrop('sel');paintChats(lastRows)}
+$('selx').onclick=()=>clearSel();
+$('selpin').onclick=()=>{const all=[...SEL].every(i=>PIN_.has(i));SEL.forEach(i=>all?PIN_.delete(i):PIN_.add(i));lsSet('abchat_pin',[...PIN_]);clearSel()};
+$('selarc').onclick=async()=>{const ids=[...SEL];clearSel();await Promise.all(ids.map(i=>updateDoc(doc(db,'chats',i),{[`archivedBy.${me.uid}`]:!arcOnly}).catch(()=>toast('Archive failed'))));toast(arcOnly?'Moved to chats':'Chats archived')};
+$('seldel').onclick=()=>{if(!confirm(`Delete ${SEL.size} chat(s)? They are removed from this device until a new message arrives.`))return;const n=Date.now();SEL.forEach(i=>{CLR[i]=n;HID[i]=n});lsSet('abchat_clr',CLR);lsSet('abchat_hid',HID);clearSel();toast('Chats deleted')};
+async function hpin(p){return HAS_CRYPTO?b64(await crypto.subtle.digest('SHA-256',te.encode('abchat'+p))):btoa('abchat'+p)}
+function askPin(id,title,ok,setMode){modal(`<div style="text-align:center"><div class="lkic">${ic('lock')}</div><h3 style="margin:10px 0 4px">${title}</h3><small id="pe" style="margin-bottom:10px;min-height:16px"></small><input id="pin" class="inp pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">${setMode?'<input id="pin2" class="inp pin" style="margin-top:8px" type="password" inputmode="numeric" maxlength="6" placeholder="Confirm">':''}<button class="pr" id="pok" style="margin-top:14px">${setMode?'Set PIN':'Unlock'}</button></div>`);
+ setTimeout(()=>$('pin')&&$('pin').focus(),250);
+ $('pok').onclick=async()=>{const v=$('pin').value;if(!/^\d{4,6}$/.test(v)){$('pe').textContent='Use 4 to 6 digits';return}
+  if(setMode){if($('pin2').value!==v){$('pe').textContent='PINs do not match';return}LOCK[id]=await hpin(v);lsSet('abchat_lock',LOCK);closeModal();setTimeout(ok,150);return}
+  if(await hpin(v)===LOCK[id]){closeModal();setTimeout(ok,150)}else{$('pe').textContent='Wrong PIN';$('pin').value=''}}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){UNL.clear();if(cur&&LOCK[cur.id])closeChat()}});
+
+let ntT;function notify(name,pic,pv,peer){chime();
+ if(S.desk&&document.hidden&&window.Notification&&Notification.permission==='granted')try{new Notification(name,{body:pv,icon:pic})}catch{}
+ if(!S.pop)return;const n=$('nt');if(!n)return;n.innerHTML=`<img class="av" src="${esc(pic)}"><div><b>${esc(name)}</b><small>${esc(pv)}</small></div>`;n.onclick=()=>{n.classList.remove('on');openChat(peer)};
+ n.classList.add('on');clearTimeout(ntT);ntT=setTimeout(()=>n.classList.remove('on'),4200)}
+
+async function openChat(peerArg){
+ {const gid=peerArg.isGroup?peerArg.uid:chatId(me.uid,peerArg.uid);if(LOCK[gid]&&!UNL.has(gid))return askPin(gid,'Enter PIN to open chat',()=>{UNL.add(gid);openChat(peerArg)})}
+ closeChat(true);
+ let peer = peerArg;
+ const isG = peer.isGroup;
+ const id = isG ? peer.uid : chatId(me.uid, peer.uid);
+ 
+ if(!isG){
+   if(!peer.uid || peer.uid === me.uid) return toast('Invalid chat profile.');
+   try{
+     const u = await getUser(peer.uid);
+     if(!u) return toast('Could not load user profile.');
+     peer = u;
+     if(!lastRows.some(r=>r.id===id))setDoc(doc(db,'chats',id),{members:[me.uid,peer.uid].sort(),isGroup:false},{merge:true}).catch(()=>{});
+   }catch(e){ return toast('Could not open chat: '+e.message); }
+ }
+ 
+ const customBg='',disappear=0;
+
+ const c=cur={id,peer,isGroup:isG,customBg,disappear,key:(!isG&&HAS_CRYPTO&&peer.pubKey&&peer.pubKey!=='fallback')?await keyFor(peer).catch(()=>null):null,cache:(DEC.get(id)||DEC.set(id,new Map()).get(id)),els:new Map(),txt:new Map(),typing:false,init:false,reply:null};
+ $('emp').classList.add('h');$('chat').classList.remove('h');$('app').classList.add('open');$('pimg').src=isG?(peer.groupPhoto||avatar({name:peer.groupName})):avatar(peer);$('pname').textContent=isG?peer.groupName:nm(peer);$('msgs').innerHTML='';clearReply();markRead(id);vpush('chat',()=>closeChat());blockUI();
+ 
+ const m=$('msgs');m.style.backgroundImage=customBg?`url(${customBg})`:S.customBg?`url(${S.customBg})`:'';m.style.backgroundSize=customBg||S.customBg?'cover':'';
+
+ if(!isG){unsubs.push(onSnapshot(doc(db,'users',peer.uid),s=>{if(cur!==c||!s.exists())return;c.peer={uid:peer.uid,...s.data()};userCache.set(peer.uid,c.peer);if(!c.typing)$('pseen').textContent=s.data().hideSeen?'':ago(s.data().lastActive);blockUI();$('pname').textContent=nm(c.peer);$('pimg').src=avatar(c.peer)}));
+  unsubs.push(onSnapshot(doc(db,'chats',id),s=>{if(cur!==c)return;const dat=s.data();const t=dat?.typing;c.typing=!!(t&&t[peer.uid]);c.disappear=dat?.disappear||0;if((dat?.customBg||'')!==c.customBg){c.customBg=dat?.customBg||'';const mm=$('msgs');mm.style.backgroundImage=c.customBg?`url(${c.customBg})`:S.customBg?`url(${S.customBg})`:'';mm.style.backgroundSize=c.customBg||S.customBg?'cover':''}$('pseen').innerHTML=c.typing?'<span style="color:var(--ac)">typing…</span>':esc(c.peer?.hideSeen?'':ago(c.peer?.lastActive))}))}
+ else $('pseen').textContent=`${peer.members.length} members`;
+ unsubs.push(onSnapshot(query(collection(db,'chats',id,'messages'),orderBy('ts','desc'),limit(80)),s=>render(c,s.docs.slice().reverse())));
+ if(innerWidth>767)$('msg').focus()}
+
+function openProfileModal(){if(!cur)return;
+  if(cur.isGroup){modal(`<div style="text-align:center"><img src="${esc(cur.peer.groupPhoto||avatar({name:cur.peer.groupName}))}" class="av" style="width:72px;height:72px;margin:0 auto 12px"><h3 style="margin-bottom:4px">${esc(cur.peer.groupName)}</h3><small>${cur.peer.members.length} members</small><button class="pr" id="mclose" style="margin-top:20px">Close</button></div>`);$('mclose').onclick=closeModal;return}
+  const p=cur.peer,bl=myBlocked.has(p.uid);
+  modal(`<div style="text-align:center"><img src="${esc(avatar(p))}" class="av" style="width:72px;height:72px;margin:0 auto 12px"><h3 style="margin-bottom:4px">${esc(nm(p))}</h3><small style="color:var(--ac);margin-bottom:10px">@${esc(p.username||'user')}</small><p style="font-size:13px;color:var(--mu);margin-bottom:16px;background:var(--pn2);padding:10px;border-radius:12px">${esc(p.about||'Hey there! I am using abchat.')}</p><div style="display:flex;gap:10px"><button class="tb ${bl?'':'dg'}" id="m-block" style="flex:1">${bl?'Unblock':'Block'}</button><button class="tb" id="m-report" style="flex:1;border-color:#f59e0b;color:#f59e0b">Report</button></div><button class="pr" id="mclose" style="margin-top:12px">Close</button></div>`);
+  $('mclose').onclick=closeModal;
+  $('m-block').onclick=async()=>{closeModal();await setBlock(p.uid,!bl);toast(bl?'User unblocked':'User blocked')};
+  $('m-report').onclick=()=>{closeModal();location.href=`mailto:${SUP_EMAIL}?subject=${encodeURIComponent('abchat user report')}&body=${encodeURIComponent('Reporting: @'+(p.username||'')+' (UID: '+p.uid+')\nReporter: '+(me.email||'')+'\nReason: ')}`}}
+if($('pimg')) $('pimg').onclick=openProfilePage;
+if($('pinfo-btn')) $('pinfo-btn').onclick=openProfilePage;
+
+async function render(c,docs){const tok=++tokR,items=[];c.lastDocs=docs;let dlDirty=false;
+ await Promise.all(docs.map(async d=>{if(c.cache.has(d.id)||c.isGroup)return;try{c.cache.set(d.id,JSON.parse(await decrypt(c.key,d.data())))}catch{c.cache.set(d.id,{t:'Message unavailable'})}}));
+ for(const d of docs){const m=d.data({serverTimestamps:'estimate'});
+  if(m.from!==me.uid&&myBlocked.has(m.from))continue;
+  if(c.isGroup&&m.from!==me.uid)await getUser(m.from);
+  if(CLR[c.id]&&m.ts&&m.ts.toMillis()<=CLR[c.id])continue;
+  if(c.disappear&&m.ts){const age=(Date.now()-m.ts.toDate())/1e3;if(age>c.disappear){deleteDoc(doc(db,'chats',c.id,'messages',d.id)).catch(()=>{});continue}}
+  let x=c.cache.get(d.id);
+  if(!x){if(c.isGroup){let t=m.ct||'',r=null;if(t[0]==='\u0001'){const i=t.indexOf('\u0002');try{r=JSON.parse(t.slice(1,i))}catch{}t=t.slice(i+1)}x={t,r}}else{try{x=JSON.parse(await decrypt(c.key,m))}catch{x={t:'Message unavailable'}}}c.cache.set(d.id,x)}
+  items.push({id:d.id,m,x})}
+ if(tok!==tokR||cur!==c)return;
+ const box=$('msgs');if(!box)return;const near=box.scrollHeight-box.scrollTop-box.clientHeight<160||!c.init,ids=new Set(items.map(i=>i.id));let inc=false;
+ box.querySelectorAll('.mw').forEach(el=>{if(!ids.has(el.dataset.id)){el.remove();c.els.delete(el.dataset.id)}});
+ let prev=null,day='';const frag=document.createDocumentFragment(),host=c.init?box:frag;
+ items.forEach(({id,m,x},i)=>{const d=m.ts?.toDate()||new Date(),dl=dlabel(d),mine=m.from===me.uid,tm=m.ts?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'…';let el=c.els.get(id);
+  if(!el){let body;
+   if(m.type==='image'||m.type==='video'){const tms=m.ts?m.ts.toMillis():Date.now(),auto=mine||DL[id]||(autoOK(m.type==='image'?S.dlImg:S.dlVid)&&(!S.dlFrom||tms>=S.dlFrom));
+    if(auto){if(!DL[id]){DL[id]=x.s||1;dlDirty=true}body=m.type==='image'?`<img src="${esc(safeUrl(m.url))}" data-img="${esc(safeUrl(m.url))}" loading="lazy">`:`<video controls playsinline preload="metadata" src="${esc(safeUrl(m.url))}"></video>`}
+    else body=`<button class="dlph" data-dl="${id}" data-t="${m.type}" data-s="${x.s||0}" data-url="${esc(safeUrl(m.url))}">${ic('download')}<span>${m.type==='image'?'Photo':'Video'}${x.s?' · '+fsize(x.s):''}</span></button>`}
+      else if(m.type==='audio')body=`<audio controls preload="metadata" src="${esc(safeUrl(m.url))}"></audio>`;
+   else if(m.type==='file')body=`<a class="fl" href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${ic('file')}<span style="min-width:0"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis">${esc(x.n||'Document')}</b><small>${fsize(x.s||0)}</small></span></a>`;
+   else body=(x.r?`<div class="q"><b>${esc(x.r.n)}</b>${esc(x.r.t)}</div>`:'')+link(esc(x.t));
+
+   const reactions=m.reactions||{};const cap=!c.isGroup&&x.cap?`<div class="cap">${link(esc(x.cap))}</div>`:'';
+   const reactHtml=Object.entries(reactions).map(([emoji,uids])=>`<span class="react-badge">${emoji} ${uids.length}</span>`).join('');
+
+   const fresh=c.init,cls=!fresh?(i>=items.length-10?'ent':''):mine?'f3r':'f3l';if(fresh&&!mine)inc=true;
+   el=document.createElement('div');el.className='mw';el.dataset.id=id;
+   el.innerHTML=`${dl!==day?`<div class="dp">${dl}</div>`:''}<div class="mr ${mine?'me':''} ${cls}"><div class="bub">${c.isGroup&&!mine?`<div class="sn">${esc(nm(userCache.get(m.from)))}</div>`:''}${body}${cap}<div class="reactions" data-h="${esc(reactHtml)}">${reactHtml}</div><div class="tm">${tm}</div><div class="act"><button data-a="r">${ic('reply')}</button><button data-a="react">👍</button>${m.type==='text'||!m.type?`<button data-a="c">${ic('copy')}</button>`:''}${mine?`<button data-a="d">${ic('trash')}</button>`:''}</div></div></div>`;
+   if(!fresh)el.style.animationDelay=(i-Math.max(0,items.length-10))*35+'ms';
+   c.els.set(id,el);c.txt.set(id,{n:mine?'You':(c.isGroup?'Member':nm(c.peer)),t:m.type==='image'?'Photo':m.type==='video'?'Video':m.type==='audio'?'Voice Note':m.type==='file'?(x.n||'File'):x.t.slice(0,90),raw:x.t})}
+  else{const t=el.querySelector('.tm');if(t&&t.textContent!==tm)t.textContent=tm;const rh=Object.entries(m.reactions||{}).map(([e,u])=>`<span class="react-badge">${e} ${u.length}</span>`).join('');const re=el.querySelector('.reactions');if(re&&re.dataset.h!==rh){re.dataset.h=rh;re.innerHTML=rh}}
+  day=dl;const want=prev?prev.nextSibling:host.firstChild;if(el!==want)host.insertBefore(el,want);prev=el});if(!c.init)box.appendChild(frag);
+ if(dlDirty)lsSet('abchat_dl',DL);
+ if(!c.init){c.init=true}else if(inc){if(!MUTE.has(c.id))chime();markRead(c.id)}
+ if(near){box.style.scrollBehavior='auto';box.scrollTop=box.scrollHeight;box.style.scrollBehavior=''}}
+
+if($('msgs')) $('msgs').onscroll=e=>{const b=e.target;$('dn').classList.toggle('h',b.scrollHeight-b.scrollTop-b.clientHeight<300)};
+if($('dn')) $('dn').onclick=()=>{$('msgs').scrollTop=$('msgs').scrollHeight};
+const isWifi=()=>{const n=navigator.connection;return n&&n.type?['wifi','ethernet'].includes(n.type):true},autoOK=m=>m==='always'||(m==='wifi'&&isWifi());
+if($('msgs')) $('msgs').onclick=async e=>{const a=e.target.closest('[data-a]'),im=e.target.dataset.img,dl=e.target.closest('[data-dl]');
+ if(dl){const u=dl.dataset.url;DL[dl.dataset.dl]=+dl.dataset.s||1;lsSet('abchat_dl',DL);dl.outerHTML=dl.dataset.t==='image'?`<img src="${esc(u)}" data-img="${esc(u)}">`:`<video controls playsinline preload="metadata" src="${esc(u)}"></video>`;return}
+ if(im)return modal(`<img src="${esc(im)}" style="max-width:100%;max-height:80vh;border-radius:14px;display:block;margin:auto">`);
+ if(a&&cur){const id=a.closest('.mw').dataset.id,t=cur.txt.get(id),k=a.dataset.a;
+  if(k==='r'){cur.reply={n:t.n,t:t.t};$('rbt').innerHTML=`<b>${esc(t.n)}</b> ${esc(t.t)}`;$('rb').classList.remove('h');$('msg').focus()}
+  if(k==='c'){navigator.clipboard?.writeText(t.raw);toast('Copied')}
+  if(k==='react'){
+    modal(`<h3 style="margin-bottom:12px">React to message</h3><div style="display:flex;gap:12px;font-size:24px;justify-content:center"><button class="emo" data-e="👍">👍</button><button class="emo" data-e="❤️">❤️</button><button class="emo" data-e="🔥">🔥</button><button class="emo" data-e="🚀">🚀</button><button class="emo" data-e="💀">💀</button></div>`);
+    $('modal').querySelectorAll('.emo').forEach(b=>b.onclick=async()=>{
+      const emoji=b.dataset.e;closeModal();
+      const mRef=doc(db,'chats',cur.id,'messages',id);
+      const snap=await getDoc(mRef);if(!snap.exists())return;
+      const data=snap.data();const r=data.reactions||{};
+      Object.keys(r).forEach(e=>{r[e]=(r[e]||[]).filter(u=>u!==me.uid);if(!r[e].length)delete r[e]});
+      r[emoji]=[...(r[emoji]||[]),me.uid];
+      await updateDoc(mRef,{reactions:r});toast('Reacted!');
+    });
+  }
+  if(k==='d'&&confirm('Delete message?'))deleteDoc(doc(db,'chats',cur.id,'messages',id)).catch(()=>toast('Delete failed'));return}
+ const b=e.target.closest('.bub');document.querySelectorAll('.bub.sel').forEach(x=>x!==b&&x.classList.remove('sel'));b?.classList.toggle('sel')};
+function clearReply(){if(cur)cur.reply=null;if($('rb'))$('rb').classList.add('h')}
+if($('rbx')) $('rbx').onclick=clearReply;
+
+async function post(c,type,url,meta,pv,gct){
+ if(c.isGroup){await addDoc(collection(db,'chats',c.id,'messages'),{from:me.uid,ct:gct??pv,ts:serverTimestamp(),type,url:url||null});updateDoc(doc(db,'chats',c.id),{updatedAt:serverTimestamp()}).catch(()=>{})}
+ else{const e=await encrypt(c.key,JSON.stringify(meta)),p=await encrypt(c.key,pv),data={from:me.uid,ct:e.ct,iv:e.iv,ts:serverTimestamp(),type};if(url)data.url=url;
+  await addDoc(collection(db,'chats',c.id,'messages'),data);updateDoc(doc(db,'chats',c.id),{updatedAt:serverTimestamp(),pv:p}).catch(()=>{})}
+ updateDoc(doc(db,'chats',c.id),{lastFrom:me.uid}).catch(()=>{})}
+async function send(){const t=$('msg').value.trim();if(!t||!cur)return;if(blockedChat())return;const r=cur.reply?{...cur.reply}:null;$('msg').value='';clearReply();beep(620);
+ try{await post(cur,'text',null,r?{t,r}:{t},t.slice(0,60),r?'\u0001'+JSON.stringify(r)+'\u0002'+t:t)}catch{toast('Send failed')}}
+if($('send')) $('send').onclick=send;
+
+let typeTO,typOn=false;
+if($('msg')){
+  $('msg').oninput=()=>{if(!cur||cur.isGroup)return;const id=cur.id;if(!typOn){typOn=true;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:true}).catch(()=>{})}clearTimeout(typeTO);typeTO=setTimeout(()=>{typOn=false;updateDoc(doc(db,'chats',id),{[`typing.${me.uid}`]:false}).catch(()=>{})},1800)};
+  $('msg').onkeydown=e=>{if(e.key==='Enter'&&S.enter)send()};
+}
+
+function pickFile(f){if(!f||!cur)return;if(blockedChat())return;
+ const isI=f.type.startsWith('image/'),isV=f.type.startsWith('video/');
+ if(!isI&&!isV)return sendFile(f,'');
+ const u=URL.createObjectURL(f);
+ modal(`<div style="text-align:center">${isI?`<img src="${u}" style="max-width:100%;max-height:48vh;border-radius:14px">`:`<video src="${u}" controls playsinline style="max-width:100%;max-height:48vh;border-radius:14px"></video>`}<input id="capin" class="inp" style="margin:12px 0" placeholder="Add a caption" maxlength="300"><div style="display:flex;gap:10px"><button class="tb" id="pcx">Cancel</button><button class="pr" id="pcs">Send</button></div></div>`);
+ $('pcx').onclick=closeModal;$('pcs').onclick=()=>{const cap=$('capin').value.trim();closeModal();sendFile(f,cap)}}
+function upl(path,blob,onp){return new Promise((ok,no)=>{const meta={contentType:blob.type||'application/octet-stream'},r=ref(storage,path);let done=false,got=false;
+ const finish=(fn,v)=>{if(done)return;done=true;fn(v)};
+ const plain=()=>{const to=setTimeout(()=>finish(no,{code:'upload/timeout'}),45000);uploadBytes(r,blob,meta).then(async x=>{clearTimeout(to);finish(ok,await getDownloadURL(x.ref))}).catch(e=>{clearTimeout(to);finish(no,e)})};
+ const task=uploadBytesResumable(r,blob,meta);
+ const stall=setTimeout(()=>{if(got||done)return;try{task.cancel()}catch{}plain()},9000);
+ task.on('state_changed',x=>{if(x.bytesTransferred>0)got=true;onp&&onp(Math.round(x.bytesTransferred/x.totalBytes*100))},
+  e=>{clearTimeout(stall);if(done)return;if(e.code==='storage/canceled'&&!got)return;if(e.code==='storage/unauthorized')return finish(no,e);plain()},
+  async()=>{clearTimeout(stall);try{finish(ok,await getDownloadURL(task.snapshot.ref))}catch(e){finish(no,e)}})})}
+async function sendFile(f,cap){const c=cur;if(!f||!c)return;if(f.size>50e6)return toast('Max file size is 50MB');
+ const type=f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':f.type.startsWith('audio/')?'audio':'file';let blob=f;
+ if(type==='image'&&f.type!=='image/gif'){try{blob=await(await scaled(f,S.q==='low'?1024:1600,S.q==='low'?.7:.82)).blob()}catch{}}
+ const fn=(f.name||'file').replace(/[^\w.\-]+/g,'_').slice(-60),box=$('msgs'),ph=document.createElement('div');ph.className='mw up';
+ ph.innerHTML=`<div class="mr me"><div class="bub">${type==='image'?`<img src="${URL.createObjectURL(blob)}">`:`<div class="fl">${ic('file')}<b style="font-size:12px">${esc(fn)}</b></div>`}<div class="tm"><span class="pc">0%</span> uploading…</div></div></div>`;box.appendChild(ph);box.scrollTop=box.scrollHeight;
+ let url='';
+ try{url=await upl(`chats/${c.id}/${me.uid}_${Date.now()}_${fn}`,blob,p=>{ph.querySelector('.pc').textContent=p+'%';$('bar').style.width=p+'%';$('prog').classList.remove('h')})}
+ catch(er){$('prog').classList.add('h');$('bar').style.width='0';
+  if(type==='image'){try{url=(await scaled(f,1000,.6)).url;toast('Sent in compact mode')}catch{}}
+  if(!url){ph.remove();return toast(er.code==='storage/unauthorized'?'Storage rules block uploads. Allow signed-in users to write.':'Upload failed ('+(er.code||er.message)+'). Make sure Firebase Storage is enabled.')}}
+ try{$('prog').classList.add('h');$('bar').style.width='0';const lab=cap||(type==='image'?'📷 Photo':type==='video'?'🎬 Video':type==='audio'?'🎙️ Voice Note':'📄 File');
+  await post(c,type,url,{n:f.name,s:f.size,cap:cap||''},lab)}catch(e){toast('Send failed: '+e.message)}finally{setTimeout(()=>ph.remove(),500)}}
+if($('fmedia')) $('fmedia').onchange=e=>{pickFile(e.target.files[0]);e.target.value=''};
+if($('fcam')) $('fcam').onchange=e=>{pickFile(e.target.files[0]);e.target.value=''};
+if($('fdoc')) $('fdoc').onchange=e=>{if(!blockedChat())sendFile(e.target.files[0],'');e.target.value=''};
+
+if($('abtn')) $('abtn').onclick=()=>{$('emenu').classList.add('h');$('amenu').classList.toggle('h')};
+if($('apic')) $('apic').onclick=()=>{$('amenu').classList.add('h');$('fmedia').click()};
+if($('adoc')) $('adoc').onclick=()=>{$('amenu').classList.add('h');$('fdoc').click()};
+if($('acam')) $('acam').onclick=()=>{$('amenu').classList.add('h');$('fcam').click()};
+
+let mediaRecorder,audioChunks=[];
+if($('audbtn')) $('audbtn').onclick=async()=>{$('amenu').classList.add('h');
+ if(!mediaRecorder){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);
+  mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+  mediaRecorder.onstop=async()=>{const mt=mediaRecorder.mimeType||'audio/webm',ex=mt.includes('mp4')?'m4a':'webm';const blob=new Blob(audioChunks,{type:mt});audioChunks=[];mediaRecorder.stream.getTracks().forEach(t=>t.stop());mediaRecorder=null;sendFile(new File([blob],'voice_note.'+ex,{type:mt}),'')};
+ }catch{return toast('Microphone access denied')}}
+ if(mediaRecorder.state==='recording'){mediaRecorder.stop();toast('Voice note sent')}else{audioChunks=[];mediaRecorder.start();toast('Recording voice note... Tap again to stop.')}};
+
+'😀 😂 😍 😘 😎 🥳 😢 😭 👍 🙏 👏 🔥 ❤️ 🎉 💯 🤝 😅 🤔 🙌 😮 😡 🤣 ✨ 💪 👀 😴 🤩 😇 🥰 👌'.split(' ').forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{$('msg').value+=e;$('msg').focus()};if($('emenu'))$('emenu').appendChild(b)});
+{const eb=$('ebtn');let emT,emLP=false;
+ eb.addEventListener('pointerdown',()=>{emLP=false;emT=setTimeout(()=>{emLP=true;$('amenu').classList.add('h');$('emenu').classList.toggle('h')},450)});
+ ['pointerup','pointerleave','pointercancel'].forEach(ev=>eb.addEventListener(ev,()=>clearTimeout(emT)));
+ eb.onclick=()=>{if(emLP){emLP=false;return}$('amenu').classList.add('h');if(S.emojiPanel){$('emenu').classList.toggle('h');return}$('emenu').classList.add('h');$('msg').focus();if(!sessionStorage.getItem('emh')){toast('Tap the emoji key on your keyboard. Hold this button for abchat emojis.');sessionStorage.setItem('emh','1')}}}
+if($('back')) $('back').onclick=()=>closeChat();
+function closeChat(keep){unsubs.forEach(f=>f());unsubs=[];if(cur&&!keep)UNL.delete(cur.id);if($('pp').classList.contains('on'))closePP();cur=null;if(!keep)vdrop('chat');$('chat').classList.add('h');$('emp').classList.remove('h');$('app').classList.remove('open');$('emenu').classList.add('h');$('amenu').classList.add('h');$('blk')?.classList.add('h')}
+if($('arcbtn')) $('arcbtn').onclick=async()=>{if(!cur)return;const r=doc(db,'chats',cur.id),isA=(await getDoc(r)).data()?.archivedBy?.[me.uid]||false;await updateDoc(r,{[`archivedBy.${me.uid}`]:!isA});toast(isA?'Chat unarchived':'Chat archived');closeChat()};
+
+if($('chatopt')) $('chatopt').onclick=()=>{if(!cur)return;modal(`<h3 style="margin-bottom:12px">Chat Options</h3><p style="font-size:13px;margin-bottom:10px">Disappearing Messages Timer</p><div class="opts"><button class="tb ${cur.disappear===0?'on':''}" data-d="0">Off</button><button class="tb ${cur.disappear===10?'on':''}" data-d="10">10s</button><button class="tb ${cur.disappear===60?'on':''}" data-d="60">1m</button><button class="tb ${cur.disappear===3600?'on':''}" data-d="3600">1h</button></div><button class="pr" data-x="chatbg" style="margin-top:14px">Set Custom Chat Wallpaper</button>`);
+ $('modal').querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{const val=+b.dataset.d;await updateDoc(doc(db,'chats',cur.id),{disappear:val});cur.disappear=val;toast('Timer updated');closeModal()});
+ $('modal').querySelector('[data-x="chatbg"]').onclick=()=>{closeModal();$('_chatbg_input')?.remove();const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_chatbg_input';inp.className='h';document.body.appendChild(inp);inp.onchange=async e=>{const f=e.target.files[0];if(f){const url=(await scaled(f,1280,.7)).url;await updateDoc(doc(db,'chats',cur.id),{customBg:url});cur.customBg=url;const m=$('msgs');m.style.backgroundImage=`url(${url})`;m.style.backgroundSize='cover';toast('Chat wallpaper set')}};inp.click()}};
+
+if($('grpbtn')) $('grpbtn').onclick=()=>{modal(`<h3 style="margin-bottom:12px">New group</h3><input id="gname" class="inp" style="margin-bottom:10px" placeholder="Group name" maxlength="30"><input id="gmem" class="inp" style="margin-bottom:14px" placeholder="Usernames, comma separated"><button id="gcreate" class="pr">Create group</button>`);
+ $('gcreate').onclick=async()=>{const name=$('gname').value.trim(),mems=$('gmem').value.split(',').map(x=>x.trim().toLowerCase().replace(/^@/,'')).filter(Boolean);if(!name||!mems.length)return toast('Enter a group name and members');
+  try{const uids=[me.uid],miss=[];for(const m of mems){const s=await getDoc(doc(db,'usernames',m));s.exists()?uids.push(s.data().uid):miss.push(m)}
+   if(uids.length<2)return toast('No users found: '+miss.join(', '));
+   await setDoc(doc(db,'chats','g_'+Date.now()),{isGroup:true,groupName:name,members:[...new Set(uids)],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+   closeModal();toast(miss.length?'Group created. Not found: '+miss.join(', '):'Group created')}catch(e){toast('Failed: '+e.message)}}};
+
+const swr=(k,t,s)=>`<div class="st"><div><b>${t}</b><small>${s}</small></div><button class="sw ${S[k]?'on':''}" data-k="${k}"></button></div>`;
+const sec=(i,ico,t,s,b)=>`<section class="acc" style="--d:${80+i*70}ms"><button class="ah" type="button"><span class="ci">${ic(ico)}</span><span>${t}<small>${s}</small></span><span class="ch">${ic('down')}</span></button><div class="bd"><div><div class="bi">${b}</div></div></div></section>`;
+const TH=[['soft','Soft lilac','linear-gradient(135deg,#f7f4ff,#9b8cff)'],['light','Light','linear-gradient(135deg,#e6f3f8,#4fb3ff)'],['neon','Dark','linear-gradient(135deg,#020b14,#00f2fe)'],['amoled','Black','linear-gradient(135deg,#000,#666)'],['gold','Royal gold','linear-gradient(135deg,#0b0907,#d4af37)'],['emerald','Emerald','linear-gradient(135deg,#04100c,#34d399)'],['rose','Rose quartz','linear-gradient(135deg,#180b12,#f4a6b8)']];
+const opt=(k,l)=>`<div class="opts">${l.map(([v,n])=>`<button class="tb ${S[k]===v?'on':''}" data-o="${k}:${v}">${n}</button>`).join('')}</div>`;
+function openSettings(){const sp=$('sp');if(!sp)return;const dn=Object.keys(DL).length,dsz=Object.values(DL).reduce((a,b)=>a+(+b>1?+b:0),0);
+ sp.innerHTML=`<div class="wrap"><div class="sbar"><button class="ib" data-x="back">${ic('back')}</button><h2>Settings</h2></div>
+ <div class="pc"><img id="sav" class="av" src="${esc(avatar(profile))}"><div><b>${esc(nm(profile))}</b><small>@${esc(profile.username||'')}</small></div></div>
+ ${sec(0,'user','Profile','Name, photo, about',`<div style="text-align:center"><button class="tb" data-x="photo" style="flex:none;padding:8px 18px">Change photo</button></div><input id="sname" class="inp" placeholder="Name" value="${esc(profile.name||'')}"><input id="sabout" class="inp" placeholder="About" value="${esc(profile.about||'')}"><button class="pr" data-x="save">Save profile</button>`)}
+ ${sec(1,'shield','Account','Backup key, sign out',`<small>${esc(me.email||'')}</small><button class="tb" data-x="bkp">Backup message key</button><button class="tb" data-x="rst">Restore message key</button>${me.email===ADMIN_EMAIL?'<button class="tb" data-x="adm">Admin dashboard</button>':''}<button class="tb dg" data-x="out">Sign out</button>`)}
+ ${sec(2,'eye','Privacy','Last seen, blocked users',swr('hideSeen','Hide last seen','Others will not see when you were online')+'<small style="margin:12px 0 6px">Blocked users</small><div id="bllist"></div>')}
+ ${sec(3,'chat','Chats','Typing, emoji, wallpaper',swr('enter','Enter to send','Off = use the send button')+swr('emojiPanel','abchat emoji panel','Off = tap opens your keyboard. Hold the emoji button for the panel')+`<div class="st"><div><b>Default wallpaper</b><small>Used in chats without their own</small></div><div class="opts"><button class="tb" data-x="bg" style="margin:0;min-width:0;padding:8px 14px">Upload</button><button class="tb" data-x="bgx" style="margin:0;min-width:0;padding:8px 14px">Reset</button></div></div>`)}
+ ${sec(4,'palette','Appearance','Themes, colour, text size',`<div class="thg">${TH.map(([k,n,g])=>`<button class="tb ${S.theme===k?'on':''}" data-th="${k}"><i style="display:block;height:34px;background:${g}"></i><span>${n}</span></button>`).join('')}</div><small style="margin:14px 0 8px">Accent colour</small><div class="opts">${Object.keys(ACS).map(k=>`<button class="dot ${S.ac===k?'on':''}" data-ac="${k}" style="background:${ACS[k][0]}"></button>`).join('')}</div><small style="margin:14px 0 4px">Text size</small><input type="range" id="sfs" min="13" max="19" value="${S.fs}">`)}
+ ${sec(5,'bell','Notifications','Sounds and alerts',swr('sound','Message sound','Beep on send and receive')+swr('pop','3D message pop-up','Card shows when another chat messages you')+swr('desk','Desktop alerts','When this tab is in the background'))}
+ ${sec(6,'db','Storage and data','Auto-download, media quality',`<small style="margin-bottom:6px">Photos</small>${opt('dlImg',[['always','Always'],['wifi','Wi-Fi only'],['never','Never']])}<small style="margin:12px 0 6px">Videos</small>${opt('dlVid',[['always','Always'],['wifi','Wi-Fi only'],['never','Never']])}<small style="margin:12px 0 6px">Photo upload quality</small>${opt('q',[['std','Standard'],['low','Data saver']])}<div class="st"><div><b>Downloaded media</b><small id="dlinfo">${dn} item(s)${dsz?' · '+fsize(dsz):''}</small></div><button class="tb dg" data-x="clrdl" style="flex:none;min-width:0;margin:0;padding:8px 14px">Delete</button></div>`)}
+ ${sec(7,'info','Accessibility','Animation and contrast',swr('fx3d','3D effects','Turn off for less motion and faster phones')+swr('hc','High contrast','Stronger borders and text'))}
+ ${sec(8,'help','Help and feedback','Contact, terms, report a problem',`<a class="sup" data-x="mail" href="mailto:${SUP_EMAIL}">Contact support<small>${SUP_EMAIL}</small></a><button class="tb" data-x="bug">Report a problem</button><button class="tb" data-x="guide">How to use abchat</button><button class="tb" data-x="terms">Terms &amp; Conditions</button>`)}
+ ${sec(9,'share','Invite a friend','Share abchat',`<button class="tb" data-x="share">Share invite link</button>`)}
+ ${sec(10,'chat','About','Version ${APP_V}',`<small>abchat ${APP_V}. Chats, statuses, chat lock, themes and more.</small>`)}</div>`;
+ requestAnimationFrame(()=>sp.classList.add('on'));vpush('sp',()=>closeSettings());paintBlocked()}
+const closeSettings=()=>{$('sp')?.classList.remove('on');vdrop('sp')};
+if($('sp')) $('sp').onclick=async e=>{const t=e.target.closest('.ah,[data-k],[data-th],[data-ac],[data-o],[data-x]');if(!t)return;
+ if(t.classList.contains('ah'))return acc(t);
+ if(t.dataset.k){const k=t.dataset.k;S[k]=S[k]?0:1;if(k==='desk'&&S.desk&&window.Notification&&Notification.permission!=='granted')Notification.requestPermission().then(p=>{if(p!=='granted'){S.desk=0;t.classList.remove('on');save()}});t.classList.toggle('on',!!S[k]);save();applyS();if(k==='hideSeen')updateDoc(doc(db,'users',me.uid),{hideSeen:!!S.hideSeen}).catch(()=>{});return}
+ if(t.dataset.th){S.theme=t.dataset.th;if(THEME_AC[S.theme])S.ac=THEME_AC[S.theme];$('sp').querySelectorAll('[data-th]').forEach(b=>b.classList.toggle('on',b===t));$('sp').querySelectorAll('[data-ac]').forEach(b=>b.classList.toggle('on',b.dataset.ac===S.ac));save();applyS();return}
+ if(t.dataset.ac){S.ac=t.dataset.ac;t.parentElement.querySelectorAll('.dot').forEach(b=>b.classList.toggle('on',b===t));save();applyS();return}
+ if(t.dataset.o){const [k,v]=t.dataset.o.split(':');S[k]=v;t.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b===t));save();return}
+ const x=t.dataset.x;
+ if(x==='mail'){e.preventDefault();location.href='mailto:'+SUP_EMAIL;return}
+ if(x==='back')closeSettings();
+ if(x==='photo')$('favatar')?.click();
+ if(x==='bg')$('fbg')?.click();
+ if(x==='bgx'){S.customBg='';save();applyS();if(cur)applyChatBg(cur);toast('Wallpaper reset')}
+ if(x==='save'){try{await updateDoc(doc(db,'users',me.uid),{name:$('sname').value.trim(),about:$('sabout').value.trim(),photoURL:profile.photoURL||''});profile.name=$('sname').value.trim();profile.about=$('sabout').value.trim();paintMe();toast('Profile saved')}catch(er){toast('Save failed: '+er.message)}}
+ if(x==='bkp'){const k=localStorage.getItem('abchat_keys_'+me.uid);if(!k)return toast('No key on this device');navigator.clipboard?.writeText?navigator.clipboard.writeText(k).then(()=>toast('Key copied. Keep it somewhere safe.')).catch(()=>prompt('Copy your key:',k)):prompt('Copy your key:',k)}
+ if(x==='rst'){const v=prompt('Paste your backup key');if(!v)return;try{const o=JSON.parse(v);if(!o.priv||!o.pub)throw 0;localStorage.setItem('abchat_keys_'+me.uid,v);toast('Key restored. Reloading…');setTimeout(()=>location.reload(),900)}catch{toast('That is not a valid key')}}
+ if(x==='clrdl'){DL={};lsSet('abchat_dl',DL);S.dlFrom=Date.now();save();try{caches.delete('abchat-media')}catch{}$('dlinfo').textContent='0 item(s)';if(cur){cur.els.clear();$('msgs').innerHTML='';cur.init=false;render(cur,cur.lastDocs||[])}toast('Downloads deleted')}
+ if(x==='share'){const u=location.href.split('#')[0];navigator.share?navigator.share({title:'abchat',text:'Chat with me on abchat',url:u}).catch(()=>{}):(navigator.clipboard?.writeText(u),toast('Invite link copied'))}
+ if(x==='terms')modal(`<h3>Terms &amp; Conditions</h3><div class="tbox">${TERMS_HTML}</div><button class="pr" id="mclose">Close</button>`),$('mclose').onclick=closeModal;
+ if(x==='guide')modal(`<h3>How to use abchat</h3><div class="tbox"><h4>Select chats</h4>Press and hold a chat in the list to pin, archive or delete it.<h4>Contact info</h4>Tap a name inside a chat for nickname, mute, chat lock, disappearing messages, wallpaper, clear chat and block.<h4>Status</h4>Tap Add status above your chats. Choose Public or Private before posting.<h4>Emoji</h4>Tap the button to open your keyboard, then use its emoji key. Hold the button for abchat emojis.<h4>Downloads</h4>Settings, Storage and data lets you choose what downloads automatically and delete downloaded media.</div><button class="pr" id="mclose">Close</button>`),$('mclose').onclick=closeModal;
+ if(x==='bug')location.href=`mailto:${SUP_EMAIL}?subject=${encodeURIComponent('abchat problem report')}&body=${encodeURIComponent('Describe the problem:\n\n\nVersion: '+APP_V+'\nDevice: '+navigator.userAgent)}`;
+ if(x==='adm')adminPanel();
+ if(x==='out'){closeSettings();signOut(auth)}};
+if($('sp')) $('sp').oninput=e=>{if(e.target.id==='sfs'){S.fs=+e.target.value;save();applyS()}};
+if($('favatar')) $('favatar').onchange=async e=>{const f=e.target.files[0];if(f){profile.photoURL=(await scaled(f,256,.8,true)).url;const sav=$('sav');if(sav)sav.src=profile.photoURL;paintMe();toast('Photo ready. Tap Save profile.')}e.target.value=''};
+if($('fbg')) $('fbg').onchange=async e=>{const f=e.target.files[0];if(f){S.customBg=(await scaled(f,1280,.7)).url;save();applyS();toast('Background set')}e.target.value=''};
+
+async function adminPanel(){if(me.email!==ADMIN_EMAIL)return;const us=await getDocs(collection(db,'users'));
+ modal(`<h3 style="margin-bottom:10px">Admin · ${us.size} users</h3><div style="overflow-x:auto"><table><tbody>${us.docs.map(d=>{const u=d.data();return`<tr><td>${esc(u.name)}<small>@${esc(u.username)}</small></td><td>${u.disabled?'Disabled':'Active'}</td><td><button class="tb" style="margin:0;padding:6px 10px;min-width:0" data-uid="${d.id}" data-d="${u.disabled?1:0}">${u.disabled?'Enable':'Disable'}</button></td></tr>`}).join('')}</tbody></table></div>`);
+ $('modal').querySelectorAll('[data-uid]').forEach(b=>b.onclick=async()=>{await updateDoc(doc(db,'users',b.dataset.uid),{disabled:b.dataset.d==='1'?false:true});toast('User status updated');adminPanel()})}
+
+/* ===== block ===== */
+function loadBlocked(){let l=[];try{l=JSON.parse(localStorage.getItem('abchat_bl_'+me.uid)||'[]')}catch{}myBlocked=new Set([...(profile.blocked||[]),...l])}
+async function setBlock(uid,on){on?myBlocked.add(uid):myBlocked.delete(uid);const a=[...myBlocked];try{localStorage.setItem('abchat_bl_'+me.uid,JSON.stringify(a))}catch{}profile.blocked=a;
+ try{await updateDoc(doc(db,'users',me.uid),{blocked:a})}catch{toast('Saved on this device only')}
+ blockUI();paintChats(lastRows);paintStories();paintBlocked();if(cur&&cur.lastDocs)render(cur,cur.lastDocs)}
+function blockedChat(){if(!cur||cur.isGroup)return false;const p=cur.peer;if(myBlocked.has(p.uid)){toast('You blocked this user. Unblock to send messages.');return true}if(p.blocked&&p.blocked.includes(me.uid)){toast('Message could not be delivered');return true}return false}
+function blockUI(){const b=$('blk');if(!b)return;if(!cur||cur.isGroup){b.classList.add('h');$('msg').disabled=false;return}const bl=myBlocked.has(cur.peer.uid);b.classList.toggle('h',!bl);$('msg').disabled=bl||!!(cur.peer.blocked&&cur.peer.blocked.includes(me.uid));$('msg').placeholder=bl?'You blocked this user':'Type a message'}
+$('unblk').onclick=()=>cur&&setBlock(cur.peer.uid,false);
+async function paintBlocked(){const l=$('bllist');if(!l)return;const a=[...myBlocked];if(!a.length){l.innerHTML='<small>No blocked users.</small>';return}
+ const us=await Promise.all(a.map(getUser));l.innerHTML='';a.forEach((uid,i)=>{const u=us[i],r=document.createElement('div');r.className='st';r.innerHTML=`<div><b>${esc(nm(u))}</b><small>@${esc(u?.username||'')}</small></div><button class="tb" style="flex:none;min-width:0;margin:0;padding:8px 14px">Unblock</button>`;r.querySelector('button').onclick=()=>setBlock(uid,false);l.appendChild(r)})}
+
+/* ===== stories / status ===== */
+const SM={pub:new Map(),prv:new Map(),own:new Map()},DAY=864e5,BGS=['#8b7bff','#ff8fb8','#2fd0a0','#ff9a76','#4fb3ff','#2a2342'],last=a=>a[a.length-1];
+let SEEN=new Set();try{SEEN=new Set(JSON.parse(localStorage.getItem('abchat_seen')||'[]'))}catch{}
+function listenStories(){storyUns.forEach(f=>f());const C=collection(db,'stories');
+ storyUns=[['pub',query(C,where('vis','==','public'),limit(80))],['prv',query(C,where('allowed','array-contains',me.uid),limit(80))],['own',query(C,where('uid','==',me.uid),limit(40))]]
+  .map(([k,q])=>onSnapshot(q,x=>{SM[k]=new Map(x.docs.map(d=>[d.id,{id:d.id,...d.data({serverTimestamps:'estimate'})}]));paintStories()},()=>{}))}
+function liveStories(){const all=new Map();[SM.pub,SM.prv,SM.own].forEach(m=>m.forEach((x,id)=>all.set(id,x)));const now=Date.now(),by=new Map();
+ all.forEach(x=>{if(!x.exp||x.exp<now){if(x.uid===me.uid&&x.exp)deleteDoc(doc(db,'stories',x.id)).catch(()=>{});return}
+  if(x.uid!==me.uid&&myBlocked.has(x.uid))return;if(!by.has(x.uid))by.set(x.uid,[]);by.get(x.uid).push(x)});
+ by.forEach(l=>l.sort((a,b)=>a.exp-b.exp));return by}
+async function paintStories(){const box=$('stories');if(!box||!me)return;const by=liveStories(),mine=by.get(me.uid)||[];
+ const uids=[...by.keys()].filter(u=>u!==me.uid).sort((a,b)=>{const ua=by.get(a).some(x=>!SEEN.has(x.id)),ub=by.get(b).some(x=>!SEEN.has(x.id));return (ub-ua)||(last(by.get(b)).exp-last(by.get(a)).exp)});
+ const us=await Promise.all(uids.map(getUser));
+ let h=`<button class="sti" data-s="add"><span class="rg add"><img class="av" src="${esc(avatar(profile))}"><i>+</i></span><small>Add status</small></button>`;
+ if(mine.length)h+=`<button class="sti" data-s="${me.uid}"><span class="rg ${mine.some(x=>!SEEN.has(x.id))?'':'seen'}"><img class="av" src="${esc(avatar(profile))}"></span><small>My status</small></button>`;
+ uids.forEach((u,i)=>{h+=`<button class="sti" data-s="${u}"><span class="rg ${by.get(u).some(x=>!SEEN.has(x.id))?'':'seen'}"><img class="av" src="${esc(avatar(us[i]))}"></span><small>${esc(nm(us[i]))}</small></button>`});
+ box.innerHTML=h}
+$('stories').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;b.dataset.s==='add'?storyAdd():openStories(b.dataset.s)};
+function storyAdd(){modal(`<h3 style="margin-bottom:12px">New status</h3><div class="opts"><button class="tb" id="sa-m">Photo / Video</button><button class="tb" id="sa-t">Text</button></div><small style="margin-top:12px">Statuses disappear after 24 hours.</small>`);
+ $('sa-m').onclick=()=>$('fstory').click();$('sa-t').onclick=()=>storyCompose(null)}
+$('fstory').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)storyCompose(f)};
+function storyCompose(f){const contacts=lastRows.filter(r=>!r.c.isGroup&&r.peerUid&&!myBlocked.has(r.peerUid));let bg=BGS[0],vis='public';const u=f?URL.createObjectURL(f):'',isV=f&&f.type.startsWith('video/');
+ modal(`<h3 style="margin-bottom:10px">New status</h3>${f?(isV?`<video src="${u}" muted playsinline controls style="width:100%;max-height:38vh;border-radius:14px"></video>`:`<img src="${u}" style="width:100%;max-height:38vh;object-fit:contain;border-radius:14px">`):`<div id="stx" class="stx" style="background:${bg}"><textarea id="stt" maxlength="200" placeholder="Type a status"></textarea></div><div class="opts" style="margin:10px 0">${BGS.map((c,i)=>`<button class="dot ${i?'':'on'}" data-bg="${c}" style="background:${c}"></button>`).join('')}</div>`}
+ <small style="margin:12px 0 6px">Who can see this?</small><div class="opts"><button class="tb on" data-v="public">Public<small>Everyone on abchat</small></button><button class="tb" data-v="private">Private<small>Only people I pick</small></button></div>
+ <div id="slist" class="h" style="margin-top:8px">${contacts.length?contacts.map(r=>`<label class="tc" style="padding:6px 0"><input type="checkbox" value="${r.peerUid}" checked><i></i><span>${esc(r.name)}</span></label>`).join(''):'<small>No contacts yet. Start a chat first.</small>'}</div>
+ <button class="pr" id="spost" style="margin-top:14px">Post status</button>`);
+ const M=$('modal');
+ M.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{vis=b.dataset.v;M.querySelectorAll('[data-v]').forEach(x=>x.classList.toggle('on',x===b));$('slist').classList.toggle('h',vis!=='private')});
+ M.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{bg=b.dataset.bg;$('stx').style.background=bg;M.querySelectorAll('[data-bg]').forEach(x=>x.classList.toggle('on',x===b))});
+ $('spost').onclick=async()=>{const text=f?'':$('stt').value.trim();if(!f&&!text)return toast('Write something first');
+  const allowed=vis==='private'?[...M.querySelectorAll('#slist input:checked')].map(i=>i.value):[];if(vis==='private'&&!allowed.length)return toast('Pick at least one person');
+  btnLoad($('spost'),true,'Posting');
+  try{let url='';
+   if(f){const fn=f.name.replace(/[^\w.\-]+/g,'_').slice(-50),blob=f.type.startsWith('image/')&&f.type!=='image/gif'?await(await scaled(f,1280,.8)).blob():f;
+    try{url=await upl(`stories/${me.uid}/${Date.now()}_${fn}`,blob,p=>{$('spost').lastChild.textContent=p+'%'})}catch(e2){if(f.type.startsWith('image/'))url=(await scaled(f,900,.6)).url;else throw e2}}
+   await addDoc(collection(db,'stories'),{uid:me.uid,type:f?(isV?'video':'image'):'text',url,text,bg,vis,allowed,ts:serverTimestamp(),exp:Date.now()+DAY});
+   closeModal();toast('Status posted')}
+  catch(er){btnLoad($('spost'),false);toast(['storage/unauthorized','permission-denied'].includes(er.code)?'Blocked by Firebase rules. Update rules for stories.':'Failed: '+(er.code||er.message))}}}
+let sv={l:[],i:0,t:0};
+function openStories(uid){const l=liveStories().get(uid);if(!l||!l.length)return;const fi=l.findIndex(x=>!SEEN.has(x.id));sv={l,i:fi<0?0:fi,t:0};$('sv').classList.remove('h');vpush('story',closeStories);showStory()}
+function closeStories(){clearTimeout(sv.t);$('sv').classList.add('h');$('svc').innerHTML='';sv={l:[],i:0,t:0};vdrop('story');paintStories()}
+async function showStory(){const x=sv.l[sv.i];if(!x)return closeStories();clearTimeout(sv.t);SEEN.add(x.id);try{localStorage.setItem('abchat_seen',JSON.stringify([...SEEN].slice(-400)))}catch{}
+ const u=x.uid===me.uid?profile:await getUser(x.uid),H=$('svh');
+ $('svb').innerHTML=sv.l.map((_,i)=>`<span><i class="${i<sv.i?'f':''}"></i></span>`).join('');
+ H.querySelector('img').src=avatar(u);H.querySelector('b').textContent=x.uid===me.uid?'My status':nm(u);H.querySelector('small').textContent=new Date(x.exp-DAY).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+(x.vis==='private'?' · Private':' · Public');$('svd').classList.toggle('h',x.uid!==me.uid);
+ const c=$('svc');
+ if(x.type==='text')c.innerHTML=`<div class="stx big" style="background:${esc(x.bg||'#8b7bff')}">${esc(x.text)}</div>`;
+ else if(x.type==='video')c.innerHTML=`<video src="${esc(safeUrl(x.url))}" autoplay playsinline></video>`;
+ else c.innerHTML=`<img src="${esc(safeUrl(x.url))}">`;
+ const bar=$('svb').children[sv.i].firstChild,next=()=>{if(sv.i<sv.l.length-1){sv.i++;showStory()}else closeStories()};
+ if(x.type==='video'){const v=c.firstChild;v.onended=next;v.ontimeupdate=()=>{if(v.duration)bar.style.width=v.currentTime/v.duration*100+'%'};v.onerror=()=>{sv.t=setTimeout(next,2500)}}
+ else{bar.style.transition='width 5s linear';requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.width='100%'));sv.t=setTimeout(next,5000)}}
+$('svx').onclick=()=>closeStories();
+$('svl').onclick=()=>{if(sv.i>0)sv.i--;showStory()};
+$('svr').onclick=()=>{if(sv.i<sv.l.length-1){sv.i++;showStory()}else closeStories()};
+$('svd').onclick=async()=>{const x=sv.l[sv.i];if(!x||!confirm('Delete this status?'))return;clearTimeout(sv.t);await deleteDoc(doc(db,'stories',x.id)).catch(()=>toast('Delete failed'));
+ ['pub','prv','own'].forEach(k=>SM[k].delete(x.id));sv.l.splice(sv.i,1);if(!sv.l.length)closeStories();else{if(sv.i>=sv.l.length)sv.i=sv.l.length-1;showStory()}};
+
+
+/* ===== profile / contact info page ===== */
+const swrp=(k,t,sub,on)=>`<div class="st"><div><b>${t}</b><small>${sub}</small></div><button class="sw ${on?'on':''}" data-pk="${k}"></button></div>`;
+const acc=t=>{const a=t.parentElement,o=a.classList.contains('o');a.parentElement.querySelectorAll('.acc.o').forEach(x=>x.classList.remove('o'));if(!o)a.classList.add('o')};
+function closePP(){$('pp').classList.remove('on');vdrop('pp')}
+function applyChatBg(c){const m=$('msgs'),b=c.customBg||S.customBg;m.style.backgroundImage=b?`url(${b})`:'';m.style.backgroundSize=b?'cover':''}
+function openProfilePage(){if(!cur)return;const c=cur,g=c.isGroup,p=c.peer,id=c.id,bl=!g&&myBlocked.has(p.uid),pp=$('pp'),isA=(lastRows.find(r=>r.id===id)||{}).isArchived;
+ const pic=g?(p.groupPhoto||avatar({name:p.groupName})):avatar(p);
+ const med=(c.lastDocs||[]).map(d=>({id:d.id,...d.data()})).filter(m=>(m.type==='image'||m.type==='video')&&m.url&&!(CLR[id]&&m.ts&&m.ts.toMillis&&m.ts.toMillis()<=CLR[id])).reverse().slice(0,18);
+ const gal=med.length?`<div class="gal">${med.map(m=>m.type==='image'?`<img src="${esc(safeUrl(m.url))}" data-img="${esc(safeUrl(m.url))}" loading="lazy">`:`<div class="vd">${ic('image')}</div>`).join('')}</div>`:'<small>No photos or videos yet.</small>';
+ pp.innerHTML=`<div class="wrap"><div class="sbar"><button class="ib" data-p="back">${ic('back')}</button><h2>${g?'Group info':'Contact info'}</h2></div>
+ <div class="pc" style="flex-direction:column;text-align:center"><img class="av" data-img="${esc(pic)}" src="${esc(pic)}" style="width:96px;height:96px;cursor:pointer"><div><h3 style="font-size:24px">${esc(g?p.groupName:nm(p))}</h3>${g?`<small>${p.members.length} members</small>`:`<small style="color:var(--ac)">@${esc(p.username||'')}</small><p style="font-size:13px;color:var(--mu);margin-top:8px">${esc(p.about||'Hey there! I am using abchat.')}</p>`}</div></div>
+ ${g?'':sec(0,'edit','Nickname','Only you can see it',`<input id="nk" class="inp" placeholder="${esc(p.name||p.username||'Nickname')}" value="${esc(NICK[p.uid]||'')}" maxlength="30"><button class="pr" data-p="nick">Save nickname</button>`)}
+ ${sec(1,'lock','Chat settings','Mute, pin, lock, disappearing',swrp('mute','Mute notifications','No sound or pop-up from this chat',MUTE.has(id))+swrp('pin','Pin chat','Keep it on top of your list',PIN_.has(id))+`<div class="st"><div><b>Chat lock</b><small>${LOCK[id]?'Opens only with your PIN':'Ask for a PIN to open this chat'}</small></div><button class="tb" data-p="lock" style="flex:none;min-width:0;margin:0;padding:8px 14px">${LOCK[id]?'Remove':'Set PIN'}</button></div><small style="margin:10px 0 6px">Disappearing messages</small><div class="opts">${[[0,'Off'],[10,'10s'],[3600,'1h'],[86400,'24h']].map(([v,n])=>`<button class="tb ${(c.disappear||0)===v?'on':''}" data-d="${v}">${n}</button>`).join('')}</div>`)}
+ ${sec(2,'image','Media','Photos and videos in this chat',gal)}
+ ${sec(3,'palette','Wallpaper','For this chat only',`<button class="tb" data-p="wp">Choose wallpaper</button><button class="tb" data-p="wpx">Reset wallpaper</button>`)}
+ ${g?sec(4,'users','Members','People in this group','<div id="mlist"><small>Loading…</small></div>'):''}
+ ${sec(5,'shield','Manage chat','Archive, clear, delete, block',`<button class="tb" data-p="arc">${isA?'Unarchive':'Archive'} chat</button><button class="tb" data-p="clear">Clear chat</button><button class="tb dg" data-p="del">Delete chat</button>${g?'':`<button class="tb ${bl?'':'dg'}" data-p="blk">${bl?'Unblock':'Block'} user</button><button class="tb" data-p="rep">Report user</button>`}`)}</div>`;
+ if(g)Promise.all(p.members.map(getUser)).then(us=>{const l=$('mlist');if(l)l.innerHTML=us.map(u=>`<div class="st"><div style="display:flex;gap:10px;align-items:center"><img class="av" style="width:36px;height:36px" src="${esc(avatar(u))}"><div><b>${esc(u.uid===me.uid?'You':nm(u))}</b><small>@${esc(u.username||'')}</small></div></div></div>`).join('')});
+ requestAnimationFrame(()=>pp.classList.add('on'));vpush('pp',closePP)}
+$('pp').onclick=async e=>{const t=e.target.closest('.ah,[data-p],[data-pk],[data-d],[data-img]');if(!t||!cur)return;const c=cur,id=c.id;
+ if(t.classList.contains('ah'))return acc(t);
+ if(t.dataset.img)return modal(`<img src="${esc(t.dataset.img)}" style="max-width:100%;max-height:80vh;border-radius:14px;display:block;margin:auto">`);
+ if(t.dataset.pk){const mu=t.dataset.pk==='mute',st=mu?MUTE:PIN_;st.has(id)?st.delete(id):st.add(id);lsSet(mu?'abchat_mute':'abchat_pin',[...st]);t.classList.toggle('on',st.has(id));paintChats(lastRows);return}
+ if(t.dataset.d!==undefined){const v=+t.dataset.d;try{await updateDoc(doc(db,'chats',id),{disappear:v});c.disappear=v;t.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b===t));toast('Timer updated')}catch{toast('Could not update timer')}return}
+ const a=t.dataset.p;
+ if(a==='back')closePP();
+ if(a==='nick'){const v=$('nk').value.trim();v?NICK[c.peer.uid]=v:delete NICK[c.peer.uid];lsSet('abchat_nick',NICK);$('pname').textContent=nm(c.peer);paintChats(lastRows);toast('Nickname saved')}
+ if(a==='lock'){LOCK[id]?askPin(id,'Enter PIN to remove lock',()=>{delete LOCK[id];lsSet('abchat_lock',LOCK);toast('Chat lock removed');openProfilePage();paintChats(lastRows)}):askPin(id,'Set a PIN for this chat',()=>{toast('Chat locked');openProfilePage();paintChats(lastRows)},true)}
+ if(a==='wp'){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.className='hf';document.body.appendChild(inp);inp.onchange=async ev=>{const f=ev.target.files[0];if(f){const url=(await scaled(f,1280,.7)).url;try{await updateDoc(doc(db,'chats',id),{customBg:url})}catch{}c.customBg=url;applyChatBg(c);toast('Wallpaper set')}inp.remove()};inp.click()}
+ if(a==='wpx'){try{await updateDoc(doc(db,'chats',id),{customBg:''})}catch{}c.customBg='';applyChatBg(c);toast('Wallpaper reset')}
+ if(a==='arc'){const isA=(lastRows.find(r=>r.id===id)||{}).isArchived;try{await updateDoc(doc(db,'chats',id),{[`archivedBy.${me.uid}`]:!isA});toast(isA?'Chat unarchived':'Chat archived');closeChat()}catch{toast('Archive failed')}}
+ if(a==='clear'){if(!confirm('Clear all messages in this chat on this device?'))return;CLR[id]=Date.now();lsSet('abchat_clr',CLR);c.els.clear();$('msgs').innerHTML='';c.init=false;render(c,c.lastDocs||[]);toast('Chat cleared');closePP()}
+ if(a==='del'){if(!confirm('Delete this chat? It comes back only when a new message arrives.'))return;CLR[id]=HID[id]=Date.now();lsSet('abchat_clr',CLR);lsSet('abchat_hid',HID);closeChat();paintChats(lastRows);toast('Chat deleted')}
+ if(a==='blk'){const bl=myBlocked.has(c.peer.uid);await setBlock(c.peer.uid,!bl);toast(bl?'User unblocked':'User blocked');openProfilePage()}
+ if(a==='rep'){const p=c.peer;location.href=`mailto:${SUP_EMAIL}?subject=${encodeURIComponent('abchat user report')}&body=${encodeURIComponent('Reporting: @'+(p.username||'')+' (UID: '+p.uid+')\nReporter: '+(me.email||'')+'\nReason: ')}`}};
+(function(){const c=$('fx');if(!c)return;const x=c.getContext('2d'),P=[];let W,H,mx=0,my=0;const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener('resize',rs);
+ for(let i=0;i<120;i++)P.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()});
+ const loginEl=$('login');
+ if(loginEl){loginEl.addEventListener('pointermove',e=>{mx=e.clientX/W-.5;my=e.clientY/H-.5;const card=$('card');if(S.fx3d&&innerWidth>720&&card)card.style.transform=`rotateY(${mx*14}deg) rotateX(${-my*12}deg)`})}
+ (function f(){!loginEl||loginEl.classList.contains('h')||document.hidden||(x.clearRect(0,0,W,H),x.fillStyle=accol,P.forEach(p=>{S.fx3d&&(p.z-=.0035),p.z<=.02&&(p.z=1,p.x=Math.random()*2-1,p.y=Math.random()*2-1);const k=.45/p.z,sx=W/2+(p.x-mx*.3)*W*k*.5,sy=H/2+(p.y-my*.3)*H*k*.5;x.globalAlpha=Math.min(1,(1-p.z)*1.2),x.beginPath(),x.arc(sx,sy,(1-p.z)*2.6+.4,0,6.3),x.fill()}),x.globalAlpha=1),requestAnimationFrame(f)})()})();
+</script></body></html>
